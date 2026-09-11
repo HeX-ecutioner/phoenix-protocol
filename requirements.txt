@@ -1,4 +1,12 @@
-# Phoenix Protocol Dependencies
+# Phoenix Protocol Dependencies - Core Backend
 flask>=3.0.0
 werkzeug>=3.0.0
+
+# Schema Validation & Agent Intelligence Layer
+pydantic>=2.0.0
+google-adk>=2.0.0
+google-genai>=2.0.0
+
+# Testing & Verification
 pytest>=8.0.0
+requests>=2.31.0
