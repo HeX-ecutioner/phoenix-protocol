@@ -47,4 +47,3 @@ __all__ = [
     "ensure_rules_seeded",
     "get_full_scan_dict",
 ]
-

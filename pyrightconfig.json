@@ -1,7 +1,9 @@
 {
-  "venvPath": ".",
-  "venv": "Backend track 1/venv",
+  "include": [
+    "app",
+    "tests"
+  ],
   "extraPaths": [
-    "./Backend track 1"
+    "."
   ]
 }

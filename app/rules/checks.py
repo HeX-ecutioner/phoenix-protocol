@@ -466,7 +466,10 @@ def check_net_009_device_identification_banner(config: NormalizedConfig, rule: R
             "severity": rule.severity,
             "evidence": ev_host.evidence_text if ev_host else f"hostname {hostname}",
             "evidence_line_range": ev_host.line_range if ev_host else None,
-            "message": f"Device identification configured (hostname '{hostname}'), but legal security warning banner (banner motd/login) is missing.",
+            "message": (
+                f"Device identification configured (hostname '{hostname}'), "
+                "but legal security warning banner (banner motd/login) is missing."
+            ),
             "remediation": rule.remediation,
         }
 

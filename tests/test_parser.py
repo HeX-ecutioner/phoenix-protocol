@@ -271,6 +271,28 @@ def test_plaintext_secret_masking_in_evidence():
     assert "[REDACTED]" in res.evidence_map["con_0_password"].evidence_text
 
 
+def test_tacacs_and_radius_key_sanitization():
+    """Verify tacacs-server key and radius-server key are redacted in evidence."""
+    from app.security.sanitization import sanitize_evidence
+
+    samples = [
+        ("tacacs-server key SuperSecretTacacsKey", "tacacs-server key [REDACTED]"),
+        ("tacacs-server key 0 PlaintextTacacsKey", "tacacs-server key 0 [REDACTED]"),
+        ("tacacs-server key 7 0822455D0A16", "tacacs-server key 7 [REDACTED]"),
+        ("tacacs-server host 10.1.1.10 key SecretTacacsHost", "tacacs-server host 10.1.1.10 key [REDACTED]"),
+        ("radius-server key SuperSecretRadiusKey", "radius-server key [REDACTED]"),
+        ("radius-server key 0 PlaintextRadiusKey", "radius-server key 0 [REDACTED]"),
+        ("radius-server host 192.168.1.1 key 7 0822455D0A16", "radius-server host 192.168.1.1 key 7 [REDACTED]"),
+    ]
+
+    for raw, expected in samples:
+        sanitized = sanitize_evidence(raw)
+        assert sanitized == expected
+        assert "SuperSecret" not in sanitized
+        assert "Plaintext" not in sanitized
+        assert "0822455D0A16" not in sanitized
+
+
 def test_line_number_and_evidence_preservation():
     """Verify source line numbers are accurately preserved across all extracted settings."""
     config_text = """! Line 1

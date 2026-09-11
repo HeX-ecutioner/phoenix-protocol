@@ -1,7 +1,6 @@
 """Scan-processing service orchestrating parsing, compliance rule evaluation, and persistence."""
 
 from datetime import datetime, timezone
-import io
 import sqlite3
 from typing import Any, Dict, List, Optional, Tuple
 import uuid
@@ -10,10 +9,9 @@ from app.database.connection import get_connection
 from app.database.schema import init_db
 from app.models.device import Device
 from app.models.normalized_config import NormalizedConfig
-from app.models.rule import Rule
 from app.models.rule_result import RuleResult
 from app.models.scan import Scan
-from app.parsers.cisco_like import CiscoLikeParser, parse_cisco_like
+from app.parsers.cisco_like import CiscoLikeParser
 from app.rules.definitions import INITIAL_RULES
 from app.rules.engine import evaluate_all
 from app.services.compliance import ComplianceSummary
@@ -55,7 +53,7 @@ def _extract_file_data(item: Any, index: int) -> Tuple[str, str, Optional[str]]:
                 or filename
             )
             raw = item.get("content") or item.get("text") or item.get("data")
-            if hasattr(raw, "read"):
+            if raw is not None and hasattr(raw, "read"):
                 raw = raw.read()
             if raw is None and "file" in item:
                 f = item["file"]

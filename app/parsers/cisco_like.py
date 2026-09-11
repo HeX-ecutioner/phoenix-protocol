@@ -171,7 +171,6 @@ def parse_cisco_like(config_text: str) -> NormalizedConfig:
                 # Banner terminated
                 in_banner = False
                 banner_range = f"{banner_start_line}-{line_idx}"
-                sanitized_banner = sanitize_evidence(line)
 
                 if banner_type == "motd":
                     settings["banners"]["motd_configured"] = True
@@ -203,9 +202,10 @@ def parse_cisco_like(config_text: str) -> NormalizedConfig:
 
         if stripped.lower() in ("exit", "end"):
             if current_line_block is not None:
-                current_line_block = _close_line_block(
+                _close_line_block(
                     current_line_block, line_idx, vty_blocks, con_blocks, aux_blocks
                 )
+                current_line_block = None
             continue
 
         # Check for sub-block vs top-level command
@@ -232,9 +232,10 @@ def parse_cisco_like(config_text: str) -> NormalizedConfig:
 
         # Top-level or unindented command: closes any open line block
         if current_line_block is not None:
-            current_line_block = _close_line_block(
+            _close_line_block(
                 current_line_block, line_idx - 1, vty_blocks, con_blocks, aux_blocks
             )
+            current_line_block = None
 
         # 1. Hostname
         if stripped.lower().startswith("hostname "):
@@ -290,7 +291,7 @@ def parse_cisco_like(config_text: str) -> NormalizedConfig:
             if settings["ssh"]["line_number"] is None:
                 settings["ssh"]["line_number"] = line_idx
 
-            ssh_sub = stripped[len("ip ssh ") :].strip()
+            ssh_sub = stripped[len("ip ssh "):].strip()
             if ssh_sub.lower().startswith("version "):
                 ver_token = ssh_sub.split()[1]
                 settings["ssh"]["version"] = int(ver_token) if ver_token.isdigit() else ver_token
@@ -528,7 +529,7 @@ def parse_cisco_like(config_text: str) -> NormalizedConfig:
         # 9. Banners
         if stripped.lower().startswith("banner motd ") or stripped.lower().startswith("banner login "):
             b_type = "motd" if "banner motd" in stripped.lower() else "login"
-            after_cmd = stripped[len(f"banner {b_type}") :].strip()
+            after_cmd = stripped[len(f"banner {b_type}"):].strip()
             if after_cmd:
                 delim = after_cmd[0]
                 remainder = after_cmd[1:]

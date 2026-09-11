@@ -18,6 +18,15 @@ SENSITIVE_PATTERNS = [
     (re.compile(r"(\bkey-string\s+)\S+", re.IGNORECASE), r"\1[REDACTED]"),
     # Matches: pre-shared-key [hex|0|6] <key>
     (re.compile(r"(\bpre-shared-key\s+(?:(?:hex|unencrypted|0|6)\s+)?)\S+", re.IGNORECASE), r"\1[REDACTED]"),
+    # Matches: (tacacs-server|radius-server) [host <ip>] key [0|7] <key>
+    (
+        re.compile(
+            r"(\b(?:tacacs-server|radius-server)\s+(?:.*?\s+)?key\s+(?:\d+\s+)?)"
+            r"(?!\[REDACTED\])\S+",
+            re.IGNORECASE,
+        ),
+        r"\1[REDACTED]",
+    ),
 ]
 
 

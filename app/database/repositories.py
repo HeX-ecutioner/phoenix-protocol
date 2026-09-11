@@ -672,4 +672,3 @@ def get_full_scan_dict(
         "compliance_score": scan_summary.tested_rule_compliance,
         "devices": devices_output,
     }
-
