@@ -249,9 +249,114 @@ Retrieves a previously evaluated scan by its unique scan ID directly from SQLite
 - **Response (200 OK)**: Standardized Phoenix Protocol scan result matching the contract above.
 - **Response (404 Not Found)**: `{"error": "Scan not found", "detail": "...", "scan_id": "..."}`
 
+## ADK Teach-the-Auditor Intelligence Layer
+
+Teach-the-Auditor is Phoenix Protocol's adaptive intelligence component powered by the Google Agent Development Kit (ADK). When an unfamiliar network configuration command is encountered during parsing or auditing, Teach-the-Auditor interprets its security semantics without replacing deterministic compliance evaluation.
+
+### Architecture & Trust Boundary
+
+```text
+UnknownCommand
+    ↓
+TeachAuditorService
+    ↓
+KnowledgeProvider (Tool: lookup_known_command)
+    ├── [FOUND]     → Trusted interpretation (requires_human_approval = False)
+    └── [NOT FOUND] → Google ADK Agent (output_schema: CommandInterpretation)
+                            ↓
+                      TeachingProposal (requires_human_approval = True)
+                            ↓
+                      (Human Review & Dev2 KnowledgeService Persistence)
+```
+
+The core trust boundary is strictly enforced:
+- **AI understands syntax and explains security meaning.**
+- **Deterministic rules evaluate whether a configuration passes or fails.**
+- **High-consequence actions (learning/persistence) require human approval.**
+- Under no circumstances does the agent produce `pass`/`fail` compliance verdicts.
+
+### 1. Agent Input Contract (`UnknownCommand`)
+
+Defined in `app/agents/schemas.py`:
+
+```python
+class UnknownCommand(BaseModel):
+    vendor: str                         # e.g., 'Cisco', 'Arista', 'Juniper'
+    platform: str                       # e.g., 'IOS', 'EOS', 'JunOS'
+    command: str                        # Raw or normalized command string
+    context: Optional[Union[str, List[str]]] = None  # Surrounding config block
+    source_line: Optional[int] = None   # 1-based source line number
+```
+
+### 2. Agent Output Contract (`CommandInterpretation`)
+
+Structured output produced by the ADK agent and validated with Pydantic:
+
+```python
+class CommandInterpretation(BaseModel):
+    command: str                        # Target command string
+    vendor: str                         # Target vendor
+    platform: str                       # Target platform
+    meaning: str                        # Concise operational explanation
+    security_control: str               # Control area (e.g. transport_security, logging)
+    mapped_rule_id: Optional[str] = None # Optional NET-001..NET-010 or null
+    confidence: float                   # Strictly bounded: 0.0 <= confidence <= 1.0
+    explanation: str                    # Semantic rationale justifying mapping
+```
+
+- `mapped_rule_id` is strictly optional (`None` is permitted). The LLM is never forced to invent rule IDs.
+- Invented or hallucinated rule IDs outside the curated catalog (`NET-001` through `NET-010`) are rejected at the schema validation boundary.
+
+### 3. KnowledgeProvider Interface (`app/agents/knowledge.py`)
+
+Abstract interface decoupling Teach-the-Auditor from any specific database implementation:
+
+```python
+class KnowledgeProvider(ABC):
+    @abstractmethod
+    def lookup_command(
+        self, vendor: str, platform: str, command: str
+    ) -> Optional[CommandInterpretation]:
+        """Look up an existing verified interpretation for a command."""
+        raise NotImplementedError
+```
+
+- **`MockKnowledgeProvider`**: In-memory, case- and whitespace-insensitive reference implementation used for deterministic unit testing and offline development.
+- The agent accesses this abstraction through a single dedicated tool: `lookup_known_command()`.
+
+### 4. Human Approval Boundary (`TeachingProposal`)
+
+AI-generated interpretations are packaged into a proposal enforcing human review:
+
+```python
+class TeachingProposal(BaseModel):
+    interpretation: CommandInterpretation
+    requires_human_approval: bool = True  # Always True for new AI interpretations
+    source: str = "ai_agent"              # 'knowledge_base' or 'ai_agent'
+```
+
+- Newly generated AI interpretations are never silently committed or persisted.
+- Pre-existing mappings loaded from the `KnowledgeProvider` set `requires_human_approval = False` as they have already undergone prior verification.
+
+### 5. Why AI Does Not Determine Compliance
+
+In Phoenix Protocol:
+1. **Determinism**: Regulatory compliance (e.g., CIS, NIST, PCI-DSS) requires mathematically reproducible audits. Two scans of identical configurations must yield identical scores.
+2. **Audit Defensibility**: Security findings must cite verifiable evidence and deterministic rule logic rather than probabilistic LLM outputs.
+3. **Role Separation**: AI interprets ambiguous syntax (e.g., unfamiliar vendor commands); deterministic rules evaluate compliance against security thresholds; humans authorize policy additions.
+
+### 6. Dev2 KnowledgeService Integration Point
+
+Dev2 is independently developing the persistent `KnowledgeService` in her branch/component. Once complete, integration requires zero changes to the ADK agent or schemas:
+
+1. Dev2's service will provide persistent storage (e.g., SQLite/PostgreSQL) with `lookup_command()`, `propose_mapping()`, `approve_mapping()`, and `reject_mapping()`.
+2. An adapter implementing `KnowledgeProvider` will wrap her `KnowledgeService.lookup_command()`.
+3. When `TeachingProposal` is approved by a human administrator, the proposal will be forwarded to her `approve_mapping()` method for long-term persistence.
+
 ## References
 
 [1]: https://google.github.io/adk-docs/ "Google Agent Development Kit Documentation"
 
 [2]: https://www.cisecurity.org/controls "CIS Critical Security Controls"
+
 
