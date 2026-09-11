@@ -11,20 +11,14 @@ import { Marquee } from '../components/motion/Marquee';
 import { InventoryScroll } from '../components/InventoryScroll';
 
 export function UploadPage() {
-  const [isHeroLoaded, setIsHeroLoaded] = React.useState(false);
   const location = useLocation();
+  const [isHeroLoaded, setIsHeroLoaded] = React.useState(false);
+  const [heroKey, setHeroKey] = React.useState(1);
 
   React.useEffect(() => {
-    if (location.hash === '#upload-section' || location.state?.scrollToUpload) {
-      setIsHeroLoaded(true);
-      const timer = setTimeout(() => {
-        const el = document.getElementById('upload-section');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 250);
-      return () => clearTimeout(timer);
-    }
+    window.scrollTo(0, 0);
+    setIsHeroLoaded(false);
+    setHeroKey(prev => prev + 1);
   }, [location]);
 
   return (
@@ -35,7 +29,7 @@ export function UploadPage() {
         </div>
         
         <main className="flex-1 w-full relative z-10">
-          <Hero onLoadComplete={() => setIsHeroLoaded(true)} />
+          <Hero key={heroKey} onLoadComplete={() => setIsHeroLoaded(true)} />
           
           <div id="upload-section" className="min-h-screen flex items-center justify-center">
             <ScannerConsole />

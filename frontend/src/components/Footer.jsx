@@ -46,16 +46,16 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Pill Button from Image 2 (Positioned bottom right above sub-footer) */}
-      <div className="absolute bottom-24 right-6 md:right-12 z-20 hidden md:block">
+      {/* Work With Us Pill Button (Positioned bottom right on desktop, centered on mobile) */}
+      <div className="relative md:absolute md:bottom-24 md:right-12 z-20 pb-8 md:pb-0 flex justify-center">
         <Link to="/contact">
           <motion.button 
-            className="flex items-center gap-6 px-8 py-4 bg-[#e24423] rounded-full text-white hover:bg-[#ff4d26] transition-colors shadow-2xl group border border-white/10"
+            className="flex items-center gap-4 md:gap-6 px-6 md:px-8 py-3.5 md:py-4 bg-[#e24423] rounded-full text-white hover:bg-[#ff4d26] transition-colors shadow-2xl group border border-white/10"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="font-mono text-sm font-bold uppercase tracking-[0.25em] pl-2">WORK WITH US</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
+            <span className="font-mono text-xs md:text-sm font-bold uppercase tracking-[0.25em] pl-2">WORK WITH US</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </motion.button>

@@ -313,8 +313,8 @@ export function AboutPage() {
             </div>
 
             <Link 
-              to="/#upload-section"
-              state={{ scrollToUpload: true }}
+              to="/"
+              state={{ showLoader: true }}
               className="px-8 py-4 bg-brand-orange hover:bg-orange-500 text-white font-mono font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all duration-300 hover:scale-105 shadow-[0_0_30px_rgba(234,88,20,0.4)] shrink-0"
             >
               <span>RETURN TO SCANNER</span>

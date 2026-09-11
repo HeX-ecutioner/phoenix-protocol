@@ -41,8 +41,8 @@ export function Navbar() {
       {/* Right: Action button navigating to About Page or Back to Upload Scanner */}
       <div className="flex items-center">
         <Link 
-          to={isSubpage ? "/#upload-section" : "/about"} 
-          state={isSubpage ? { scrollToUpload: true } : undefined}
+          to={isSubpage ? "/" : "/about"} 
+          state={isSubpage ? { showLoader: true } : undefined}
           className={`flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border transition-all duration-300 group ${
             isSubpage 
               ? 'border-brand-orange/60 bg-brand-orange/10 shadow-[0_0_20px_rgba(234,88,20,0.2)]' 

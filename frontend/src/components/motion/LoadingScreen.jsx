@@ -2,34 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from 'framer-motion';
 
-export function LoadingScreen({ onComplete }) {
+export function LoadingScreen({ onComplete, duration = 1800, message = "INITIALIZING SECURE SCANNER CONSOLE" }) {
   const shouldReduceMotion = useReducedMotion();
   const [stage, setStage] = useState('drawing');
 
   useEffect(() => {
     if (shouldReduceMotion) {
-      onComplete();
+      if (onComplete) onComplete();
       return;
     }
 
-    const timer1 = setTimeout(() => setStage('glowing'), 2000);
-    const timer2 = setTimeout(() => {
-      setStage('exit');
-    }, 3500);
-    
+    const t1 = duration * 0.45;
+    const t2 = duration * 0.8;
+    const t3 = duration;
+
+    const timer1 = setTimeout(() => setStage('glowing'), t1);
+    const timer2 = setTimeout(() => setStage('exit'), t2);
     const timer3 = setTimeout(() => {
-      onComplete();
-    }, 4500);
+      if (onComplete) onComplete();
+    }, t3);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [onComplete, shouldReduceMotion]);
+  }, [onComplete, duration, shouldReduceMotion]);
 
-  const circleTransition = { duration: 1.5, ease: "easeInOut" };
-  const lineTransition = { duration: 1, ease: "easeInOut" };
+  const circleTransition = { duration: duration * 0.0006, ease: "easeInOut" };
+  const lineTransition = { duration: duration * 0.00045, ease: "easeInOut" };
 
   return (
     <AnimatePresence>
@@ -118,16 +119,16 @@ export function LoadingScreen({ onComplete }) {
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: stage !== 'exit' ? 1 : 0, y: 0 }}
-              transition={{ delay: 1, duration: 0.5 }}
-              className="text-white font-mono text-xs tracking-[0.3em] uppercase"
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-white font-mono text-xs tracking-[0.3em] uppercase text-center px-4"
             >
-              Establishing Connection
+              {message}
             </motion.div>
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: "100px" }}
-              transition={{ delay: 1, duration: 2.5, ease: "linear" }}
-              className="h-[1px] bg-brand-orange mt-4"
+              animate={{ width: "140px" }}
+              transition={{ delay: 0.2, duration: duration * 0.0007, ease: "linear" }}
+              className="h-[2px] bg-brand-orange mt-4 shadow-[0_0_12px_rgba(234,88,20,0.8)]"
             />
           </div>
         </motion.div>
