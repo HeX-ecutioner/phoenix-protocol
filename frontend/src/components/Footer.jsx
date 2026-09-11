@@ -65,19 +65,27 @@ export function Footer() {
       {/* Sub Footer (Black Bar) */}
       <div className="w-full bg-black py-6 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between text-[9px] md:text-[10px] font-mono text-neutral-500 tracking-[0.2em] uppercase z-10 border-t border-neutral-900">
         <div>
-          CRAFTED BY PHOENIX TEAM
+          CRAFTED BY THE COASTAL ASSASINS
         </div>
         <div className="flex gap-4 md:gap-8 my-4 md:my-0">
-          <a href="#" className="hover:text-white transition-colors">COOKIE POLICY</a>
+          <Link to="/cookies" className="hover:text-white transition-colors">COOKIE POLICY</Link>
           <span>/</span>
-          <a href="#" className="hover:text-white transition-colors">TERMS OF USE</a>
+          <Link to="/terms" className="hover:text-white transition-colors">TERMS OF USE</Link>
           <span>/</span>
-          <a href="#" className="hover:text-white transition-colors">PRIVACY POLICY</a>
+          <Link to="/privacy" className="hover:text-white transition-colors">PRIVACY POLICY</Link>
         </div>
         <div className="flex gap-4">
-          <a href="#" className="hover:text-white transition-colors">LINKEDIN</a>
-          <span>/</span>
-          <a href="#" className="hover:text-white transition-colors">GITHUB</a>
+          <a 
+            href="https://github.com/HeX-ecutioner/phoenix-protocol" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-brand-orange transition-colors flex items-center gap-1.5"
+          >
+            <span>GITHUB</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
+            </svg>
+          </a>
         </div>
       </div>
     </footer>
