@@ -84,6 +84,10 @@ export function PolicyPage({ type = 'cookies' }) {
   const navigate = useNavigate();
   const policy = POLICIES[type] || POLICIES.cookies;
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [type]);
+
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col w-full bg-obsidian text-white relative selection:bg-brand-orange selection:text-white">

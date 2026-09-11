@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 
 export function AboutPage() {
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
+
   const pillars = [
     {
       code: "ARCH_01",

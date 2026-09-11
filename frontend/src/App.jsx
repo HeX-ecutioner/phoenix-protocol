@@ -26,9 +26,22 @@ function AnimatedRoutes() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  React.useEffect(() => {
+    if (!hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AnimatedRoutes />
     </BrowserRouter>
   );
