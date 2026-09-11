@@ -1,7 +1,7 @@
 """Flask API package for Phoenix Protocol."""
 
 from typing import Any, Dict, Optional
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from app.api.routes import api_bp
@@ -35,6 +35,21 @@ def create_app(
     # Global error handlers
     @app.errorhandler(RequestEntityTooLarge)
     def handle_large_payload(error):
+        if request.path.startswith("/api/"):
+            return (
+                jsonify(
+                    {
+                        "data": None,
+                        "error": {
+                            "code": "PAYLOAD_TOO_LARGE",
+                            "message": "Uploaded file or total request payload exceeds size limits.",
+                            "details": [],
+                        },
+                        "request_id": f"req-err",
+                    }
+                ),
+                413,
+            )
         return (
             jsonify(
                 {
@@ -47,11 +62,30 @@ def create_app(
 
     @app.errorhandler(404)
     def handle_not_found(error):
+        if request.path.startswith("/api/"):
+            return (
+                jsonify(
+                    {
+                        "data": None,
+                        "error": {
+                            "code": "NOT_FOUND",
+                            "message": str(
+                                error.description if hasattr(error, "description") else error
+                            ),
+                            "details": [],
+                        },
+                        "request_id": f"req-err",
+                    }
+                ),
+                404,
+            )
         return (
             jsonify(
                 {
                     "error": "Resource not found",
-                    "detail": str(error.description if hasattr(error, "description") else error),
+                    "detail": str(
+                        error.description if hasattr(error, "description") else error
+                    ),
                 }
             ),
             404,
@@ -59,6 +93,21 @@ def create_app(
 
     @app.errorhandler(500)
     def handle_internal_error(error):
+        if request.path.startswith("/api/"):
+            return (
+                jsonify(
+                    {
+                        "data": None,
+                        "error": {
+                            "code": "INTERNAL_ERROR",
+                            "message": "An unexpected server error occurred.",
+                            "details": [],
+                        },
+                        "request_id": f"req-err",
+                    }
+                ),
+                500,
+            )
         return (
             jsonify(
                 {
