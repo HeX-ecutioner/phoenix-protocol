@@ -11,13 +11,13 @@ export function Features() {
     },
     {
       icon: <ShieldAlert className="text-brand-orange" size={32} />,
-      title: "Hardened Rules",
-      desc: "Maps directly to strict STIG and CIS security benchmarks."
+      title: "Deterministic Rules",
+      desc: "Authoritative rule evaluation (NET-001..NET-010). AI provides advisory guidance."
     },
     {
       icon: <Cpu className="text-brand-orange" size={32} />,
-      title: "Multi-Vendor",
-      desc: "Normalized evaluation across Cisco, Juniper, and Arista syntaxes."
+      title: "Extensible Architecture",
+      desc: "Currently supports Cisco IOS configurations, with an extensible architecture for additional vendors."
     },
     {
       icon: <Lock className="text-brand-orange" size={32} />,
