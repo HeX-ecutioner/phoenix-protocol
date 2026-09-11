@@ -1,13 +1,27 @@
-"""Teach-the-Auditor agentic package for Phoenix Protocol.
+"""Teach-the-Auditor and AI intelligence package for Phoenix Protocol.
 
-Exports structured data contracts, knowledge provider interfaces, and the ADK
-Teach-the-Auditor agent service.
+Exports structured data contracts, knowledge provider interfaces, ADK agents,
+explanation services, remediation agents, and orchestration bridges.
 """
 
-from app.agents.knowledge import KnowledgeProvider, MockKnowledgeProvider
+from app.agents.audit_bridge import AuditorLearningBridge
+from app.agents.explanation import FindingExplainer
+from app.agents.knowledge import (
+    Dev2KnowledgeProvider,
+    KnowledgeProvider,
+    MockKnowledgeProvider,
+)
+from app.agents.orchestrator import PhoenixAuditorOrchestrator
+from app.agents.remediation import (
+    RemediationService,
+    build_remediation_agent,
+    heuristic_remediation_generator,
+)
 from app.agents.schemas import (
     KNOWN_PHOENIX_RULES,
     CommandInterpretation,
+    FindingExplanation,
+    RemediationSuggestion,
     TeachingProposal,
     UnknownCommand,
 )
@@ -24,11 +38,21 @@ __all__ = [
     "UnknownCommand",
     "CommandInterpretation",
     "TeachingProposal",
+    "RemediationSuggestion",
+    "FindingExplanation",
     "KnowledgeProvider",
     "MockKnowledgeProvider",
+    "Dev2KnowledgeProvider",
     "TeachAuditorService",
     "build_teach_auditor_agent",
     "make_lookup_tool",
     "heuristic_fallback_interpreter",
     "TEACH_AUDITOR_INSTRUCTION",
+    "RemediationService",
+    "build_remediation_agent",
+    "heuristic_remediation_generator",
+    "FindingExplainer",
+    "AuditorLearningBridge",
+    "PhoenixAuditorOrchestrator",
 ]
+
