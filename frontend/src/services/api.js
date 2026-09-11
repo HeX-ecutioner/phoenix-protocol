@@ -66,6 +66,17 @@ async function handleMockRequest(path, options) {
     };
   }
 
+  if (path === '/api/contact' && options.method === 'POST') {
+    return {
+      data: {
+        ticket_id: `PX-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-MOCK01`,
+        status: "received"
+      },
+      error: null,
+      request_id: "req-mock-contact"
+    };
+  }
+
   if (path.match(/^\/api\/scans\/[^/]+$/)) {
     return MOCK_SCAN_SUMMARY;
   }
@@ -125,7 +136,7 @@ export async function getDevices(scanId) {
   return apiRequest(`/api/scans/${scanId}/devices`);
 }
 
-export async function getDevice(scanId, deviceId, filters = {}) {
+export async function getDevice(scanId, deviceId, _filters = {}) {
   const response = await apiRequest(`/api/scans/${scanId}/devices/${deviceId}`);
   // Normalize response: ensure response.data.device is consistently present
   if (response?.data && !response.data.device) {
@@ -137,7 +148,7 @@ export async function getDevice(scanId, deviceId, filters = {}) {
   return response;
 }
 
-export async function getRules(filters = {}) {
+export async function getRules(_filters = {}) {
   return apiRequest('/api/rules');
 }
 
@@ -168,4 +179,14 @@ export async function downloadCsvReport(scanId) {
   a.click();
   a.remove();
   window.URL.revokeObjectURL(downloadUrl);
+}
+
+export async function submitContact(data) {
+  return apiRequest('/api/contact', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 }
