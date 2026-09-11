@@ -48,4 +48,9 @@ line vty 0 4
  exec-timeout 10 0
  transport input ssh
 !
+line vty 5 15
+ access-class ADMIN_MGMT_ACL in
+ exec-timeout 10 0
+ transport input ssh
+!
 end
