@@ -26,7 +26,8 @@ export function DashboardPage() {
         ]);
         
         setSummary(scanResponse.data);
-        setDevices(devicesResponse.data.devices);
+        const devList = devicesResponse?.data?.devices || scanResponse?.data?.devices || [];
+        setDevices(devList);
       } catch (err) {
         setError(err.message || 'Failed to load dashboard data.');
       } finally {
@@ -48,13 +49,27 @@ export function DashboardPage() {
   
   if (error) return (
     <PageTransition>
-      <div className="min-h-screen bg-obsidian flex items-center justify-center p-6"><ErrorAlert message={error} /></div>
+      <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-lg">
+          <Link to="/" className="inline-flex items-center gap-2 mb-6 text-xs text-neutral-500 font-bold uppercase tracking-widest hover:text-brand-orange transition-colors group">
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Return to Scanner
+          </Link>
+          <ErrorAlert message={error} />
+        </div>
+      </div>
     </PageTransition>
   );
   
   if (!summary) return (
     <PageTransition>
-      <div className="min-h-screen bg-obsidian flex items-center justify-center font-mono text-neutral-500">No scan data found.</div>
+      <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-lg text-center font-mono text-neutral-500">
+          <p className="mb-4">No scan data found for ID "{scanId}".</p>
+          <Link to="/" className="inline-flex items-center gap-2 text-xs text-brand-orange font-bold uppercase tracking-widest hover:text-white transition-colors">
+            <ArrowLeft size={14} /> Return to Scanner
+          </Link>
+        </div>
+      </div>
     </PageTransition>
   );
 

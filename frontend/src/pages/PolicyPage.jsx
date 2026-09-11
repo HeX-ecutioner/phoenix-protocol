@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, FileText, Lock, Cookie, Terminal } from 'lucide-react';
+import { ArrowLeft, Terminal } from 'lucide-react';
 import { PageTransition } from '../components/motion/PageTransition';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';

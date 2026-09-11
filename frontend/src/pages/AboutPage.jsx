@@ -1,27 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { PageTransition } from '../components/motion/PageTransition';
-import { 
-  ShieldCheck, 
-  Terminal, 
-  Lock, 
-  Cpu, 
-  FileCode, 
-  CheckCircle2, 
-  AlertTriangle, 
-  ArrowRight,
-  Radio,
-  Server,
-  Fingerprint,
-  Zap
-} from 'lucide-react';
+import { getRules } from '../services/api';
+import { CheckCircle2, Fingerprint, ArrowRight, Lock } from 'lucide-react';
 
 export function AboutPage() {
+  const [loadedRules, setLoadedRules] = React.useState(null);
+
   React.useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    async function fetchRules() {
+      try {
+        const res = await getRules();
+        if (res?.data?.rules && res.data.rules.length > 0) {
+          setLoadedRules(res.data.rules.map(r => ({
+            id: r.id || r.rule_id,
+            control: r.title || r.name,
+            severity: (r.severity || 'high').toUpperCase(),
+            cat: (r.category || 'BASELINE').toUpperCase()
+          })));
+        }
+      } catch {
+        // Fall back to default catalog
+      }
+    }
+    fetchRules();
   }, []);
 
   const pillars = [
@@ -36,7 +41,7 @@ export function AboutPage() {
       code: "ARCH_02",
       title: "DETERMINISTIC EVALUATION",
       badge: "ZERO AMBIGUITY",
-      description: "No hallucinated policy interpretations. Every security check is verified against strict, mathematical AST parsing and vendor-specific syntax grammars.",
+      description: "No hallucinated policy interpretations. Every security check is verified against strict, deterministic rule logic. AI assists with explanations and advisory remediation.",
       highlight: "Every pass or fail is 100% reproducible and verifiable."
     },
     {
@@ -44,33 +49,39 @@ export function AboutPage() {
       title: "EVIDENCE-FIRST AUDIT TRAILS",
       badge: "EXACT CITATIONS",
       description: "Unlike opaque scanners that return vague ratings, Phoenix Protocol extracts the exact line numbers, configuration blocks, and context tokens proving each finding.",
-      highlight: "Audit-ready reports suitable for SOC2, ISO 27001, and CIS benchmarks."
+      highlight: "Audit-ready reports with automatic credential sanitization."
     },
     {
       code: "ARCH_04",
-      title: "MULTI-VENDOR SYNTAX ENGINE",
-      badge: "UNIFIED SCHEMA",
-      description: "Normalizes heterogeneous configurations across Cisco IOS, IOS-XE, NX-OS, Arista EOS, and Juniper Junos into a clean, canonical compliance data model.",
+      title: "EXTENSIBLE ARCHITECTURE",
+      badge: "CISCO IOS MVP",
+      description: "Currently supports Cisco IOS configurations, with an extensible architecture for additional vendors (Cisco NX-OS, Juniper Junos, Arista EOS).",
       highlight: "Unified posture analysis across hybrid network fleets."
     }
   ];
 
-  const ruleCatalog = [
-    { id: "NET-SEC-001", control: "Telnet Service Disabled", severity: "CRITICAL", cat: "TRANSPORT" },
-    { id: "NET-SEC-002", control: "SSH v2 Strict Enforcement", severity: "HIGH", cat: "AUTHENTICATION" },
-    { id: "NET-SEC-003", control: "Type 7 / Plaintext Secret Ban", severity: "CRITICAL", cat: "CREDENTIALS" },
-    { id: "NET-SEC-004", control: "VTY Line Access Class (ACL)", severity: "HIGH", cat: "ACCESS_CONTROL" },
-    { id: "NET-SEC-005", control: "Centralized Remote Syslog", severity: "MEDIUM", cat: "TELEMETRY" },
-    { id: "NET-SEC-006", control: "NTP Synchronization & Auth", severity: "MEDIUM", cat: "CLOCK_SYNC" }
+  const defaultRuleCatalog = [
+    { id: "NET-001", control: "Telnet Service Disabled", severity: "HIGH", cat: "MANAGEMENT" },
+    { id: "NET-002", control: "SSH Version 2 Enforced", severity: "HIGH", cat: "AUTHENTICATION" },
+    { id: "NET-003", control: "Type 7 / Insecure Passwords Prohibited", severity: "HIGH", cat: "CREDENTIALS" },
+    { id: "NET-004", control: "Enable Secret Configured", severity: "HIGH", cat: "CREDENTIALS" },
+    { id: "NET-005", control: "SNMP Insecure Community Strings Banned", severity: "HIGH", cat: "SNMP" },
+    { id: "NET-006", control: "Syslog Logging Enabled", severity: "MEDIUM", cat: "TELEMETRY" },
+    { id: "NET-007", control: "NTP Server Configured", severity: "MEDIUM", cat: "CLOCK_SYNC" },
+    { id: "NET-008", control: "AAA Authentication Enabled", severity: "HIGH", cat: "ACCESS_CONTROL" },
+    { id: "NET-009", control: "VTY Access Class Applied", severity: "MEDIUM", cat: "ACCESS_CONTROL" },
+    { id: "NET-010", control: "Banner Motd Configured", severity: "LOW", cat: "BANNER" }
   ];
 
+  const ruleCatalog = loadedRules || defaultRuleCatalog;
+
   const techSpecs = [
-    { label: "ENGINE_CORE", value: "Phoenix Deterministic AST v2.4" },
-    { label: "EXECUTION_MODE", value: "Read-Only / Air-Gapped / Static" },
-    { label: "SUPPORTED_TARGETS", value: "Cisco IOS/NX-OS, Arista EOS, Junos" },
-    { label: "OUTPUT_FORMATS", value: "JSON AST, Executive SARIF, Human Matrix" },
-    { label: "INTEGRITY_CHECK", value: "SHA-256 Digest Per Device Config" },
-    { label: "DEPLOYMENT", value: "Stateless / Zero Data Persistence" }
+    { label: "ENGINE_CORE", value: "Deterministic Rule Engine (NET-001..NET-010)" },
+    { label: "EXECUTION_MODE", value: "Read-Only / Air-Gapped / Offline Static" },
+    { label: "SUPPORTED_TARGETS", value: "Cisco IOS (Active MVP; Extensible Multi-Vendor)" },
+    { label: "OUTPUT_FORMATS", value: "JSON REST API, Sanitized CSV Report" },
+    { label: "INTEGRITY_CHECK", value: "Secret Redaction & Zero Config Persistence" },
+    { label: "AI_AUTHORITY", value: "Deterministic Scoring; Advisory AI Guidance" }
   ];
 
   return (

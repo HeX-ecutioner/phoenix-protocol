@@ -24,7 +24,7 @@ export function DevicePage() {
     async function loadDevice() {
       try {
         const response = await getDevice(scanId, deviceId);
-        setDeviceData(response.data.device);
+        setDeviceData(response.data?.device || response.data);
       } catch (err) {
         setError(err.message || 'Failed to load device details.');
       } finally {
@@ -46,17 +46,31 @@ export function DevicePage() {
   
   if (error) return (
     <PageTransition>
-      <div className="min-h-screen bg-obsidian flex items-center justify-center p-6"><ErrorAlert message={error} /></div>
+      <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-lg">
+          <Link to={`/scans/${scanId}`} className="inline-flex items-center gap-2 mb-6 text-xs text-neutral-500 font-bold uppercase tracking-widest hover:text-brand-orange transition-colors group">
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back to dashboard
+          </Link>
+          <ErrorAlert message={error} />
+        </div>
+      </div>
     </PageTransition>
   );
   
   if (!deviceData) return (
     <PageTransition>
-      <div className="min-h-screen bg-obsidian flex items-center justify-center font-mono text-neutral-500">Device not found.</div>
+      <div className="min-h-screen bg-obsidian flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-lg text-center font-mono text-neutral-500">
+          <p className="mb-4">Device not found for ID "{deviceId}".</p>
+          <Link to={`/scans/${scanId}`} className="inline-flex items-center gap-2 text-xs text-brand-orange font-bold uppercase tracking-widest hover:text-white transition-colors">
+            <ArrowLeft size={14} /> Back to dashboard
+          </Link>
+        </div>
+      </div>
     </PageTransition>
   );
 
-  const filteredResults = deviceData.results.filter(result => {
+  const filteredResults = (deviceData.results || []).filter(result => {
     if (statusFilter !== 'all' && result.status !== statusFilter) return false;
     if (severityFilter !== 'all' && result.severity !== severityFilter) return false;
     return true;
