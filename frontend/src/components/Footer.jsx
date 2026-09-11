@@ -27,12 +27,6 @@ export function Footer() {
             </p>
           </div>
           <div>
-            <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-mono mb-1">Phone Number</p>
-            <p className="text-sm md:text-base text-white font-bold uppercase tracking-wider">
-              (IN) +91 98765 43210<br/>(EU) +44 20 7946 0958
-            </p>
-          </div>
-          <div>
             <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-mono mb-1">Email</p>
             <p className="text-sm md:text-base text-white font-bold uppercase tracking-wider">
               SECURE@PHOENIX-PROTOCOL.COM

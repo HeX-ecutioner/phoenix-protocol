@@ -121,7 +121,7 @@ const Row = ({ protocol, key1, key2, ip }) => {
 
 export function InventoryScroll() {
   return (
-    <section id="global-topology" className="w-full bg-obsidian relative">
+    <section id="global-topology" className="w-full bg-obsidian relative scroll-mt-20">
       
       {/* Header */}
       <div className="text-center pt-32 pb-[15vh]">

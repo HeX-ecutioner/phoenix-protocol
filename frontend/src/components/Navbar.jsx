@@ -32,40 +32,48 @@ export function Navbar() {
         </Link>
         <Link 
           to="/#global-topology" 
+          onClick={(e) => {
+            if (location.pathname === '/') {
+              e.preventDefault();
+              const el = document.getElementById('global-topology');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.history.replaceState(null, '', '#global-topology');
+              }
+            }
+          }}
           className="text-neutral-400 hover:text-brand-orange transition-colors text-xs font-bold tracking-widest uppercase"
         >
           GLOBAL TOPOLOGY
         </Link>
-      </div>
-
-      {/* Right: Action button navigating to About Page or Back to Upload Scanner */}
-      <div className="flex items-center">
-        <Link 
-          to={isSubpage ? "/" : "/about"} 
-          state={isSubpage ? { showLoader: true } : undefined}
-          className={`flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border transition-all duration-300 group ${
-            isSubpage 
-              ? 'border-brand-orange/60 bg-brand-orange/10 shadow-[0_0_20px_rgba(234,88,20,0.2)]' 
-              : 'border-neutral-800 hover:border-neutral-600 bg-black/40 hover:bg-neutral-900/60'
+        <Link
+          to="/contact"
+          className={`transition-colors text-xs font-bold tracking-widest uppercase ${
+            location.pathname === '/contact' ? 'text-brand-orange' : 'text-neutral-400 hover:text-brand-orange'
           }`}
         >
-          <span className={`text-xs font-bold tracking-[0.2em] uppercase transition-colors ${
-            isSubpage ? 'text-brand-orange' : 'text-white'
-          }`}>
-            {isSubpage ? 'BACK TO SCANNER' : 'READ-ONLY MODE'}
-          </span>
-          <div className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center group-hover:scale-105 transition-transform">
-            {isSubpage ? (
+          CONTACT
+        </Link>
+      </div>
+
+      {/* Right: Subpage return action (cleanly absent on homepage) */}
+      <div className="flex items-center">
+        {isSubpage && (
+          <Link
+            to="/"
+            state={{ showLoader: true }}
+            className="flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border border-brand-orange/60 bg-brand-orange/10 shadow-[0_0_20px_rgba(234,88,20,0.2)] transition-all duration-300 group"
+          >
+            <span className="text-xs font-bold tracking-[0.2em] uppercase text-brand-orange">
+              BACK TO SCANNER
+            </span>
+            <div className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center group-hover:scale-105 transition-transform">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-4 h-4 ml-0.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            )}
-          </div>
-        </Link>
+            </div>
+          </Link>
+        )}
       </div>
     </nav>
   );
