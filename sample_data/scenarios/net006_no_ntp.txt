@@ -1,0 +1,50 @@
+! Phoenix Protocol Scenario: NET-006 Trusted Time Source (NTP) Missing
+! Diagnostic isolation: Only NET-006 fails because NTP server is absent
+version 15.7
+hostname NET006-NONTP-RTR
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+no ip http server
+no ip http secure-server
+no service tcp-small-servers
+no service udp-small-servers
+no ip source-route
+!
+banner motd ^C
+===================================================
+AUTHORIZED ACCESS ONLY - MONITORING ACTIVE
+===================================================
+^C
+!
+username secadmin privilege 15 secret 9 $9$dummyNet006ScryptHash12345
+enable secret 9 $9$dummyNet006ScryptEnableHash12345
+!
+ip domain-name enterprise.internal
+ip ssh version 2
+login block-for 300 attempts 3 within 60
+logging host 198.51.100.50
+!
+! Violation: No 'ntp server' statement configured
+!
+ip access-list standard MGMT_ADMIN_ACL
+ permit 192.0.2.0 0.0.0.255
+ deny any log
+!
+line con 0
+ exec-timeout 10 0
+ transport output none
+!
+line vty 0 4
+ access-class MGMT_ADMIN_ACL in
+ exec-timeout 10 0
+ transport input ssh
+!
+line vty 5 15
+ access-class MGMT_ADMIN_ACL in
+ exec-timeout 10 0
+ transport input ssh
+!
+end

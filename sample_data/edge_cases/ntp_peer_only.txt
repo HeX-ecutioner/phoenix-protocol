@@ -1,0 +1,43 @@
+! Phoenix Protocol Sample: NTP Peer Only Configuration
+! Tests warning generation when NTP peer exists but no authoritative NTP server is configured
+version 15.5
+hostname PEER-NTP-RTR
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+no ip http server
+no ip http secure-server
+no service tcp-small-servers
+no service udp-small-servers
+no ip source-route
+!
+banner motd ^C
+AUTHORIZED USERS ONLY
+^C
+!
+username admin privilege 15 secret 9 $9$dummyNtpPeerScryptHash12345
+enable secret 9 $9$dummyNtpPeerScryptEnableHash12345
+!
+ip domain-name lab.internal
+ip ssh version 2
+login block-for 300 attempts 3 within 60
+logging host 198.51.100.50
+!
+! NTP peer configured without authoritative ntp server statement
+ntp peer 198.51.100.222
+!
+ip access-list standard MGMT_ACL
+ permit 192.0.2.0 0.0.0.255
+ deny any log
+!
+line vty 0 4
+ access-class MGMT_ACL in
+ transport input ssh
+!
+line vty 5 15
+ access-class MGMT_ACL in
+ transport input ssh
+!
+end

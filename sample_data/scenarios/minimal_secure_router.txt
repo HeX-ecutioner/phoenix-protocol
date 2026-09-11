@@ -1,0 +1,17 @@
+! Phoenix Protocol Scenario: Minimal Secure Router
+! Minimal valid syntax satisfying all 10 baseline compliance checks without extraneous commands
+hostname MIN-SEC-RTR
+service password-encryption
+no ip http server
+banner motd ^C
+AUTHORIZED ACCESS ONLY
+^C
+enable secret 9 $9$dummyMinimalHash123456789
+ip ssh version 2
+login block-for 300 attempts 3 within 60
+logging host 198.51.100.10
+ntp server 198.51.100.20
+line vty 0 4
+ access-class 10 in
+ transport input ssh
+end

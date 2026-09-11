@@ -1,0 +1,21 @@
+! Phoenix Protocol Sample: Ambiguous/Incomplete Cisco Router Configuration
+! Target: Missing sections, ambiguous line settings, partial configs needing warnings
+version 15.4
+! Missing hostname statement
+!
+service timestamps log datetime
+!
+username operator privilege 5 secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7x0
+!
+! NTP peer configured instead of server, or incomplete time source
+ntp peer 192.168.1.1
+!
+! Ambiguous transport: transport input all or partially configured vty
+line vty 0 4
+ transport input all
+! line vty 5 15 missing or undefined
+!
+! Logging buffer enabled, but remote syslog host missing
+logging buffered 64000
+!
+end

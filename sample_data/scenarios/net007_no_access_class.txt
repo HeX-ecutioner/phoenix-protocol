@@ -1,0 +1,44 @@
+! Phoenix Protocol Scenario: NET-007 Approved Access List Missing
+! Diagnostic isolation: Only NET-007 fails because VTY lines lack access-class
+version 15.7
+hostname NET007-NOACL-RTR
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+no ip http server
+no ip http secure-server
+no service tcp-small-servers
+no service udp-small-servers
+no ip source-route
+!
+banner motd ^C
+===================================================
+AUTHORIZED ACCESS ONLY - MONITORING ACTIVE
+===================================================
+^C
+!
+username secadmin privilege 15 secret 9 $9$dummyNet007ScryptHash12345
+enable secret 9 $9$dummyNet007ScryptEnableHash12345
+!
+ip domain-name enterprise.internal
+ip ssh version 2
+login block-for 300 attempts 3 within 60
+logging host 198.51.100.50
+ntp server 198.51.100.123
+!
+line con 0
+ exec-timeout 10 0
+ transport output none
+!
+! Violation: Missing access-class on all VTY line blocks
+line vty 0 4
+ exec-timeout 10 0
+ transport input ssh
+!
+line vty 5 15
+ exec-timeout 10 0
+ transport input ssh
+!
+end

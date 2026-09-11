@@ -1,0 +1,17 @@
+! Phoenix Protocol Sample: Partial Configuration Fragment
+! Plausible Cisco-like syntax with hostname and interface, but no security baseline
+hostname FRAGMENT-RTR-01
+!
+ip domain-name lab.internal
+!
+interface GigabitEthernet0/0
+ description Management Uplink
+ ip address 192.0.2.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Access Network
+ ip address 198.51.100.1 255.255.255.0
+ shutdown
+!
+end

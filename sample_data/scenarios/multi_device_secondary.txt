@@ -1,0 +1,49 @@
+! Phoenix Protocol Scenario: Multi-Device Secondary Device
+! Demonstrates multi-file / multi-device upload with distinct hostname and partial compliance (70%)
+version 15.5
+hostname BRANCH-RTR-02
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+no ip http server
+no ip http secure-server
+no service tcp-small-servers
+no service udp-small-servers
+no ip source-route
+!
+banner motd ^C
+===================================================
+BRANCH-RTR-02 - AUTHORIZED USERS ONLY
+===================================================
+^C
+!
+username branchadmin privilege 15 secret 9 $9$dummyBranchScryptHashString456
+enable secret 9 $9$dummyBranchScryptEnableHashString456
+!
+ip domain-name branch.internal
+ip ssh version 2
+ip ssh time-out 60
+!
+! Notice: Missing login block-for, logging host, and ntp server
+!
+ip access-list standard MGMT_BRANCH_ACL
+ permit 192.0.2.0 0.0.0.255
+ deny any log
+!
+line con 0
+ exec-timeout 10 0
+ transport output none
+!
+line vty 0 4
+ access-class MGMT_BRANCH_ACL in
+ exec-timeout 10 0
+ transport input ssh
+!
+line vty 5 15
+ access-class MGMT_BRANCH_ACL in
+ exec-timeout 10 0
+ transport input ssh
+!
+end

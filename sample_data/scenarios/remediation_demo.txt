@@ -1,0 +1,36 @@
+! Phoenix Protocol Scenario: Remediation Demo Configuration
+! Designed to generate clear, actionable remediations across all severity levels
+version 15.2
+hostname REMEDIATION-DEMO-RTR
+!
+! LOW VIOLATIONS: Insecure services explicitly enabled
+ip http server
+service tcp-small-servers
+service udp-small-servers
+!
+! LOW VIOLATION: Missing banner motd and banner login
+!
+! HIGH VIOLATIONS: Insecure plaintext credentials
+no service password-encryption
+username netadmin privilege 15 password 0 DEMO_INSECURE_PASS_99
+enable password DEMO_ENABLE_INSECURE_PLAIN
+!
+ip domain-name legacy.internal
+!
+! HIGH VIOLATION: Missing ip ssh version 2
+!
+! MEDIUM VIOLATION: Missing login block-for brute-force protection
+!
+! MEDIUM VIOLATION: Missing remote logging host
+!
+! MEDIUM VIOLATION: Missing trusted NTP time source
+!
+line con 0
+ exec-timeout 15 0
+!
+! HIGH VIOLATIONS: Telnet permitted and missing access-class restriction
+line vty 0 4
+ transport input telnet
+ login
+!
+end

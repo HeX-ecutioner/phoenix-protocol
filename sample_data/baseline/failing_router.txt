@@ -1,0 +1,33 @@
+! Phoenix Protocol Sample: Failing Cisco Router Configuration
+! Target: Multiple compliance violations across baseline security checks
+version 15.1
+hostname DEFAULT-RTR
+!
+no service password-encryption
+service tcp-small-servers
+service udp-small-servers
+ip http server
+!
+! Missing banner motd
+!
+username admin privilege 15 password 0 PlaintextPassword123!
+enable password cisco
+!
+ip domain-name legacy.local
+! Missing ip ssh version 2
+!
+! Missing login block-for brute-force protection
+!
+! Missing logging host
+!
+! Missing ntp server
+!
+line con 0
+ password 7 0822455D0A16
+!
+line vty 0 4
+ ! Missing access-class restriction
+ transport input telnet
+ password 7 070C285F4D06
+!
+end

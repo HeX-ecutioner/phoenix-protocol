@@ -1,0 +1,16 @@
+! Phoenix Protocol Sample: Malformed Banner
+! Deliberately unclosed delimiter before EOF to verify safe parser error handling
+version 15.6
+hostname MALFORMED-BANNER-RTR
+!
+banner motd ^C
+=====================================================
+UNAUTHORIZED ACCESS PROHIBITED - CORPORATE NETWORK
+ALL SESSIONS RECORDED
+=====================================================
+! Notice: Deliberately missing closing delimiter before end of file
+!
+line vty 0 4
+ transport input ssh
+!
+end
