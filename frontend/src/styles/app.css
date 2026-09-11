@@ -24,10 +24,36 @@
   }
   
   .bg-radial-glow {
-    background: radial-gradient(circle at center, rgba(226, 68, 35, 0.15) 0%, transparent 60%);
+    background: radial-gradient(circle at center, rgba(234, 88, 20, 0.15) 0%, transparent 70%);
   }
   
   .glass-card {
     @apply bg-neutral-900/60 border border-neutral-800/80 backdrop-blur-md rounded-lg;
   }
+}
+
+/* Custom Orange Scrollbar matching brutalist/futuristic dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #07080a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #EA5814;
+  border-radius: 9999px;
+  border: 2px solid #07080a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f97316;
+}
+
+/* Firefox standard scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #EA5814 #07080a;
 }
