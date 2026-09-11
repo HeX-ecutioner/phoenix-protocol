@@ -1,9 +1,12 @@
 """Comprehensive tests for Track 2 scan-processing service (Checkpoint 4)."""
 
 import io
+from pathlib import Path
 import sqlite3
 from typing import Generator
 import pytest
+
+SAMPLE_DATA_DIR = Path(__file__).resolve().parent.parent / "sample_data"
 
 from app.database.connection import get_connection
 from app.database.repositories import (
@@ -50,7 +53,7 @@ def test_run_scan_contract_signature(memory_db):
 
 def test_scan_single_compliant_configuration(memory_db):
     """1. Single compliant config -> completed scan, 100% compliance, all rules pass."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     res = run_scan(
@@ -79,7 +82,7 @@ def test_scan_single_compliant_configuration(memory_db):
 
 def test_scan_single_failing_configuration(memory_db):
     """2. Single failing config -> completed scan with 10 failures and 0.0% compliance."""
-    with open("sample_data/failing_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     res = run_scan(
@@ -103,7 +106,7 @@ def test_scan_single_failing_configuration(memory_db):
 
 def test_scan_ambiguous_configuration_preserves_warnings(memory_db):
     """3. Ambiguous config -> warnings preserved and excluded from score denominator."""
-    with open("sample_data/ambiguous_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     res = run_scan(
@@ -130,11 +133,11 @@ def test_scan_ambiguous_configuration_preserves_warnings(memory_db):
 
 def test_scan_multiple_configurations_multiple_devices(memory_db):
     """4. Multiple config files -> multiple Device records and correct summaries."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         comp_content = f.read()
-    with open("sample_data/failing_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "r", encoding="utf-8") as f:
         fail_content = f.read()
-    with open("sample_data/ambiguous_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "r", encoding="utf-8") as f:
         ambi_content = f.read()
 
     res = run_scan(
@@ -163,9 +166,9 @@ def test_scan_multiple_configurations_multiple_devices(memory_db):
 
 def test_scan_level_and_device_level_counts(memory_db):
     """5 & 6. Correct device-level counts and aggregated scan-level counts."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         comp_content = f.read()
-    with open("sample_data/failing_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "r", encoding="utf-8") as f:
         fail_content = f.read()
 
     res = run_scan(
@@ -206,9 +209,9 @@ def test_scan_score_uses_aggregated_pass_fail_not_average_percentages(memory_db)
     Device B: 50% from 2 tested rules (1 pass, 1 fail)
     Scan score must be 11 / 12 * 100 = 91.67%, NOT (100 + 50) / 2 = 75.0%.
     """
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         comp_content = f.read()
-    with open("sample_data/ambiguous_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "r", encoding="utf-8") as f:
         ambi_content = f.read()
 
     res = run_scan(
@@ -253,7 +256,7 @@ def test_scan_score_uses_aggregated_pass_fail_not_average_percentages(memory_db)
 
 def test_scan_persists_devices_and_rule_results(memory_db):
     """9 & 10. Scan, Devices, and RuleResults are all persisted with valid foreign keys."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     scan_id = "scan-fk-test"
@@ -302,7 +305,7 @@ def test_scan_lifecycle_status_transitions(memory_db):
     fetched = scan_repo.get_by_id(scan_id)
     assert fetched.status == "pending"
 
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     res = run_scan(
@@ -379,7 +382,7 @@ def test_empty_and_malformed_configuration(memory_db):
 
 def test_parser_failure_isolated_from_other_devices(memory_db):
     """A parser failure for one device does not corrupt or abort other devices."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         comp_content = f.read()
 
     res = run_scan(
@@ -478,7 +481,7 @@ def test_secrets_masked_in_returned_results_and_evidence(memory_db):
 
 def test_repeated_deterministic_scan_behavior(memory_db):
     """16. Repeated scans with identical input produce identical summaries and findings."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     files = [{"filename": "compliant.cfg", "content": content}]
@@ -503,7 +506,7 @@ def test_repeated_deterministic_scan_behavior(memory_db):
 
 def test_file_like_objects_and_tuples_supported(memory_db):
     """Verify uploaded_files accepts io.StringIO and 2-element tuples."""
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     file_obj = io.StringIO(content)
@@ -539,9 +542,9 @@ def test_track2_end_to_end_integration(memory_db):
 
     Verify database records match returned summary and results exactly.
     """
-    with open("sample_data/compliant_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "r", encoding="utf-8") as f:
         comp_content = f.read()
-    with open("sample_data/failing_router.txt", "r", encoding="utf-8") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "r", encoding="utf-8") as f:
         fail_content = f.read()
 
     scan_id = "scan-e2e-integ"

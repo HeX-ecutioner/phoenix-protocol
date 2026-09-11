@@ -1,9 +1,12 @@
 """Tests for Cisco-like configuration parser."""
 
+from pathlib import Path
 import pytest
 
 from app.models.normalized_config import NormalizedConfig
 from app.parsers.cisco_like import CiscoLikeParser, parse_cisco_like
+
+SAMPLE_DATA_DIR = Path(__file__).resolve().parent.parent / "sample_data"
 
 
 def test_parser_signature_and_return_type():
@@ -391,7 +394,7 @@ def test_determinism_repeated_parses():
 def test_sample_fixtures_parsing():
     """Verify parsing against all three project sample fixtures."""
     # 1. Compliant Router
-    with open("sample_data/compliant_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt") as f:
         comp = parse_cisco_like(f.read())
     assert comp.device_name == "CORE-RTR-01"
     assert comp.settings["ssh"]["version"] == 2
@@ -402,7 +405,7 @@ def test_sample_fixtures_parsing():
     assert comp.warnings == []
 
     # 2. Failing Router
-    with open("sample_data/failing_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt") as f:
         fail = parse_cisco_like(f.read())
     assert fail.device_name == "DEFAULT-RTR"
     assert fail.settings["ssh"]["enabled"] is False
@@ -411,7 +414,7 @@ def test_sample_fixtures_parsing():
     assert len(fail.warnings) >= 4
 
     # 3. Ambiguous Router
-    with open("sample_data/ambiguous_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt") as f:
         ambi = parse_cisco_like(f.read())
     assert ambi.device_name is None
     assert len(ambi.warnings) >= 4

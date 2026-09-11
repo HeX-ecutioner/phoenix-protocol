@@ -1,6 +1,8 @@
-"""Tests for deterministic compliance rule engine and baseline rules NET-001 to NET-010."""
+from pathlib import Path
 
 from app.models.normalized_config import ConfigEvidence, NormalizedConfig
+
+SAMPLE_DATA_DIR = Path(__file__).resolve().parent.parent / "sample_data"
 from app.models.rule import Rule
 from app.models.rule_result import ALLOWED_SEVERITIES, ALLOWED_STATUSES, RuleResult
 from app.parsers.cisco_like import BlockList, parse_cisco_like
@@ -272,7 +274,7 @@ def test_net_010_plaintext_secrets_logic():
 
 def test_compliant_router_fixture_all_pass():
     """Verify compliant_router.txt produces 10/10 PASS findings and 100.0% compliance."""
-    with open("sample_data/compliant_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt") as f:
         config = parse_cisco_like(f.read())
 
     engine = RuleEngine()
@@ -293,7 +295,7 @@ def test_compliant_router_fixture_all_pass():
 
 def test_failing_router_fixture_all_fail():
     """Verify failing_router.txt produces 10/10 FAIL findings and 0.0% compliance."""
-    with open("sample_data/failing_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt") as f:
         config = parse_cisco_like(f.read())
 
     engine = RuleEngine()
@@ -313,7 +315,7 @@ def test_failing_router_fixture_all_fail():
 
 def test_ambiguous_router_fixture_warnings_preserved():
     """Verify ambiguous_router.txt produces warnings/manual-review states rather than silently passing."""
-    with open("sample_data/ambiguous_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt") as f:
         config = parse_cisco_like(f.read())
 
     results = evaluate_all(config)
@@ -376,7 +378,7 @@ def test_multiple_vty_blocks_single_insecure_fails_rule():
 
 def test_engine_determinism():
     """Verify rule evaluation is completely deterministic across repeated invocations."""
-    with open("sample_data/compliant_router.txt") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt") as f:
         config = parse_cisco_like(f.read())
 
     res1 = evaluate_all(config)
