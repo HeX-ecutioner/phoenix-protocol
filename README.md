@@ -134,8 +134,124 @@ This demonstrates both the practical security value and the adaptive agentic cap
 
 > **Rise above configuration complexity. Secure every network.**
 
+## Backend API & Developer Documentation
+
+### Installation & Environment Setup
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Running Tests
+
+```bash
+# Run complete test suite (Track 2 core + Flask API)
+python -m pytest -v
+```
+
+### Running the Flask API Server
+
+```bash
+# Run using Flask CLI
+flask --app "app.api:create_app()" run --port 5000
+```
+
+Or programmatically in Python:
+```python
+from app.api import create_app
+
+app = create_app()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+### API Endpoints
+
+#### 1. `GET /health`
+Returns service operational health metadata.
+
+**Response (200 OK):**
+```json
+{
+  "status": "healthy",
+  "service": "phoenix-protocol",
+  "version": "1.0.0"
+}
+```
+
+#### 2. `POST /scan`
+Uploads one or more network device configuration files and triggers deterministic compliance analysis.
+
+- **Content-Type**: `multipart/form-data`
+- **Parameters**:
+  - `file` or `files`: One or more configuration files (up to 10 MB each).
+  - `device_type` (optional): Requested device profile. Currently supported: `cisco_ios` (default).
+
+**Response (201 Created):**
+```json
+{
+  "scan_id": "scan_b2c47a59e...",
+  "status": "completed",
+  "device_type": "cisco_ios",
+  "parser_version": "1.0.0",
+  "rule_set_version": "1.0.0",
+  "summary": {
+    "total_rules": 10,
+    "passed_rules": 10,
+    "failed_rules": 0,
+    "warning_rules": 0,
+    "not_applicable_rules": 0,
+    "error_rules": 0,
+    "tested_rule_compliance": 100.0
+  },
+  "compliance_score": 100.0,
+  "devices": [
+    {
+      "device_id": "9b1deb4d...",
+      "name": "CORE-RTR-01",
+      "display_name": "CORE-RTR-01",
+      "vendor": "Cisco",
+      "device_type": "cisco_ios",
+      "source_filename": "core_rtr.cfg",
+      "parse_status": "success",
+      "line_count": 85,
+      "error_message": null,
+      "summary": {
+        "total_rules": 10,
+        "passed_rules": 10,
+        "failed_rules": 0,
+        "warning_rules": 0,
+        "not_applicable_rules": 0,
+        "error_rules": 0,
+        "tested_rule_compliance": 100.0
+      },
+      "compliance_score": 100.0,
+      "results": [
+        {
+          "rule_id": "NET-001",
+          "status": "pass",
+          "severity": "high",
+          "evidence": "transport input ssh",
+          "evidence_line_range": "45-46",
+          "message": "Telnet is disabled on all administrative VTY line blocks (SSH-only enforced).",
+          "remediation": "line vty 0 4\n transport input ssh"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### 3. `GET /scans/<scan_id>`
+Retrieves a previously evaluated scan by its unique scan ID directly from SQLite persistence.
+
+- **Response (200 OK)**: Standardized Phoenix Protocol scan result matching the contract above.
+- **Response (404 Not Found)**: `{"error": "Scan not found", "detail": "...", "scan_id": "..."}`
+
 ## References
 
 [1]: https://google.github.io/adk-docs/ "Google Agent Development Kit Documentation"
 
 [2]: https://www.cisecurity.org/controls "CIS Critical Security Controls"
+
