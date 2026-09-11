@@ -1,3 +1,4 @@
-# Phoenix Protocol - Backend Track 2 Dependencies
-# Kept strictly minimal: standard library used for app core (sqlite3, dataclasses, typing, etc.)
+# Phoenix Protocol Dependencies
+flask>=3.0.0
+werkzeug>=3.0.0
 pytest>=8.0.0

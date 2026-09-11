@@ -20,6 +20,7 @@ from app.database.repositories import (
     list_rule_results_for_device,
     list_rules,
     ensure_rules_seeded,
+    get_full_scan_dict,
 )
 from app.database.schema import init_db
 
@@ -43,4 +44,7 @@ __all__ = [
     "list_rule_results_for_device",
     "get_device_summary",
     "get_scan_summary",
+    "ensure_rules_seeded",
+    "get_full_scan_dict",
 ]
+

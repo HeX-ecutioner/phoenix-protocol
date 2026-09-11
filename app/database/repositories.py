@@ -611,3 +611,65 @@ def ensure_rules_seeded(
     for rule in target_rules:
         repo.upsert(rule)
 
+
+def get_full_scan_dict(
+    conn: sqlite3.Connection, scan_id: str
+) -> Optional[Dict[str, Any]]:
+    """Retrieve full scan details matching the standardized Phoenix Protocol contract."""
+    scan_repo = ScanRepository(conn)
+    dev_repo = DeviceRepository(conn)
+    res_repo = RuleResultRepository(conn)
+
+    scan = scan_repo.get_by_id(scan_id)
+    if scan is None:
+        return None
+
+    devices = dev_repo.list_by_scan_id(scan_id)
+    devices_output: List[Dict[str, Any]] = []
+
+    for dev in devices:
+        dev_summary = res_repo.get_device_summary(dev.id)
+        dev_results = res_repo.list_by_device_id(dev.id)
+
+        formatted_results = [
+            {
+                "rule_id": r.rule_id,
+                "status": r.status,
+                "severity": r.severity,
+                "evidence": r.evidence,
+                "evidence_line_range": r.evidence_line_range,
+                "message": r.message,
+                "remediation": r.remediation,
+            }
+            for r in dev_results
+        ]
+
+        devices_output.append(
+            {
+                "device_id": dev.id,
+                "name": dev.name,
+                "display_name": dev.display_name,
+                "vendor": dev.vendor,
+                "device_type": dev.device_type,
+                "source_filename": dev.source_filename,
+                "parse_status": dev.parse_status,
+                "line_count": dev.line_count,
+                "error_message": dev.error_message,
+                "summary": dev_summary.to_dict(),
+                "compliance_score": dev_summary.tested_rule_compliance,
+                "results": formatted_results,
+            }
+        )
+
+    scan_summary = res_repo.get_scan_summary(scan_id)
+    return {
+        "scan_id": scan.id,
+        "status": scan.status,
+        "device_type": scan.device_type,
+        "parser_version": scan.parser_version,
+        "rule_set_version": scan.rule_set_version,
+        "summary": scan_summary.to_dict(),
+        "compliance_score": scan_summary.tested_rule_compliance,
+        "devices": devices_output,
+    }
+
