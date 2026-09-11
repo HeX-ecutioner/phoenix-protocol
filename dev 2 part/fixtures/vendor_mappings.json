@@ -1,0 +1,96 @@
+[
+  {
+    "concept": "Enforce SSHv2 and disable legacy SSHv1",
+    "security_control": "secure_ssh_version",
+    "mapped_rule_id": "NET-002",
+    "mappings": [
+      {
+        "vendor": "Cisco",
+        "platform": "cisco_ios",
+        "command_pattern": "ip ssh version 2",
+        "meaning": "Sets global SSH server protocol version to 2",
+        "security_control": "secure_ssh_version",
+        "mapped_rule_id": "NET-002",
+        "confidence": 1.0,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Juniper",
+        "platform": "junos",
+        "command_pattern": "set system services ssh protocol-version v2",
+        "meaning": "Enforces SSHv2 protocol support for inbound management connections",
+        "security_control": "secure_ssh_version",
+        "mapped_rule_id": "NET-002",
+        "confidence": 1.0,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Fortinet",
+        "platform": "fortios",
+        "command_pattern": "set ssh-enc-algo chacha20-poly1305@openssh.com,aes256-gcm@openssh.com",
+        "meaning": "Restricts SSH to strong modern cipher suites on administrative ports",
+        "security_control": "secure_ssh_version",
+        "mapped_rule_id": "NET-002",
+        "confidence": 0.95,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Palo Alto",
+        "platform": "panos",
+        "command_pattern": "set deviceconfig system ssh-service-profile Strong-SSH-Profile",
+        "meaning": "Applies a hardened SSH security profile requiring SSHv2 and strong ciphers",
+        "security_control": "secure_ssh_version",
+        "mapped_rule_id": "NET-002",
+        "confidence": 0.94,
+        "approval_status": "approved"
+      }
+    ]
+  },
+  {
+    "concept": "Disable Insecure HTTP Management Web Server",
+    "security_control": "insecure_services_disabled",
+    "mapped_rule_id": "NET-008",
+    "mappings": [
+      {
+        "vendor": "Cisco",
+        "platform": "cisco_ios",
+        "command_pattern": "no ip http server",
+        "meaning": "Disables unencrypted HTTP administration service",
+        "security_control": "insecure_services_disabled",
+        "mapped_rule_id": "NET-008",
+        "confidence": 1.0,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Juniper",
+        "platform": "junos",
+        "command_pattern": "set system services web-management http disable",
+        "meaning": "Deactivates plain HTTP web management daemon",
+        "security_control": "insecure_services_disabled",
+        "mapped_rule_id": "NET-008",
+        "confidence": 0.98,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Fortinet",
+        "platform": "fortios",
+        "command_pattern": "set admin-http disable",
+        "meaning": "Disables unencrypted HTTP administrative access globally",
+        "security_control": "insecure_services_disabled",
+        "mapped_rule_id": "NET-008",
+        "confidence": 0.96,
+        "approval_status": "approved"
+      },
+      {
+        "vendor": "Palo Alto",
+        "platform": "panos",
+        "command_pattern": "set deviceconfig system service disable-http yes",
+        "meaning": "Disables plain text HTTP service on management interface",
+        "security_control": "insecure_services_disabled",
+        "mapped_rule_id": "NET-008",
+        "confidence": 0.97,
+        "approval_status": "approved"
+      }
+    ]
+  }
+]

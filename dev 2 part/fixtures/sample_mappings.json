@@ -1,0 +1,50 @@
+[
+  {
+    "vendor": "Cisco",
+    "platform": "cisco_ios",
+    "command_pattern": "transport input ssh",
+    "meaning": "Disables Telnet and enforces encrypted SSH management on terminal lines",
+    "security_control": "secure_remote_management",
+    "mapped_rule_id": "NET-001",
+    "explanation": "Restricts VTY lines to SSH protocol exclusively.",
+    "confidence": 0.98,
+    "source": "human",
+    "approval_status": "approved"
+  },
+  {
+    "vendor": "Juniper",
+    "platform": "junos",
+    "command_pattern": "set system services ssh protocol-version v2",
+    "meaning": "Enforces SSHv2 and forbids insecure legacy SSHv1 daemon operations",
+    "security_control": "secure_ssh_version",
+    "mapped_rule_id": "NET-002",
+    "explanation": "Junos system service configuration requiring modern cryptographic ciphers.",
+    "confidence": 0.95,
+    "source": "ai_agent",
+    "approval_status": "approved"
+  },
+  {
+    "vendor": "Fortinet",
+    "platform": "fortios",
+    "command_pattern": "set admin-lockout-threshold 3",
+    "meaning": "Locks administrative accounts after three consecutive failed authentication attempts",
+    "security_control": "login_brute_force_protection",
+    "mapped_rule_id": "NET-004",
+    "explanation": "FortiOS global admin setting protecting management against credential guessing.",
+    "confidence": 0.92,
+    "source": "human",
+    "approval_status": "approved"
+  },
+  {
+    "vendor": "Palo Alto",
+    "platform": "panos",
+    "command_pattern": "set deviceconfig system service disable-http yes",
+    "meaning": "Disables insecure unencrypted HTTP web management interface",
+    "security_control": "insecure_services_disabled",
+    "mapped_rule_id": "NET-008",
+    "explanation": "PAN-OS system setting disabling plaintext cleartext web access.",
+    "confidence": 0.96,
+    "source": "ai_agent",
+    "approval_status": "proposed"
+  }
+]

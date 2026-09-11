@@ -1,0 +1,71 @@
+[
+  {
+    "description": "Missing required field 'meaning'",
+    "payload": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "logging host 10.1.1.1",
+      "security_control": "system_logging"
+    },
+    "expected_error": "Required field 'meaning' is missing or empty"
+  },
+  {
+    "description": "Negative confidence value",
+    "payload": {
+      "vendor": "Juniper",
+      "platform": "junos",
+      "command_pattern": "set system root-authentication",
+      "meaning": "Configures root password",
+      "security_control": "authentication",
+      "confidence": -0.25
+    },
+    "expected_error": "must be a numeric value between 0.0 and 1.0"
+  },
+  {
+    "description": "Excessive confidence value above 1.0",
+    "payload": {
+      "vendor": "Fortinet",
+      "platform": "fortios",
+      "command_pattern": "config system admin",
+      "meaning": "Configures administrator account",
+      "security_control": "account_management",
+      "confidence": 1.5
+    },
+    "expected_error": "must be a numeric value between 0.0 and 1.0"
+  },
+  {
+    "description": "Invalid approval status",
+    "payload": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "service password-encryption",
+      "meaning": "Enables password encryption",
+      "security_control": "password_protection",
+      "approval_status": "trusted_auto_approved"
+    },
+    "expected_error": "Invalid approval_status"
+  },
+  {
+    "description": "Malformed mapped_rule_id with invalid characters",
+    "payload": {
+      "vendor": "Palo Alto",
+      "platform": "panos",
+      "command_pattern": "set mgt-config users admin",
+      "meaning": "Configures admin account",
+      "security_control": "account_management",
+      "mapped_rule_id": "NET-001; DROP TABLE mappings;--"
+    },
+    "expected_error": "Invalid mapped_rule_id format"
+  },
+  {
+    "description": "Excessively long command pattern exceeding boundary limit",
+    "payload": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "access-list 101 permit ip any any long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
+      "meaning": "Permits all IP traffic",
+      "security_control": "access_control"
+    },
+    "expected_error": "exceeds maximum allowed length"
+  }
+]

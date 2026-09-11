@@ -1,0 +1,62 @@
+[
+  {
+    "description": "Base approved mapping",
+    "mapping": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "ip ssh version 2",
+      "meaning": "Enforces SSH version 2 protocol globally",
+      "security_control": "secure_ssh_version",
+      "mapped_rule_id": "NET-002",
+      "explanation": "Standard Cisco IOS command.",
+      "confidence": 1.0,
+      "source": "human",
+      "approval_status": "approved"
+    }
+  },
+  {
+    "description": "Exact duplicate of approved mapping (should fail approval or creation)",
+    "mapping": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "ip ssh version 2",
+      "meaning": "Duplicate definition of SSHv2 enforcement",
+      "security_control": "secure_ssh_version",
+      "mapped_rule_id": "NET-002",
+      "explanation": "Duplicate test case.",
+      "confidence": 0.85,
+      "source": "ai_agent",
+      "approval_status": "approved"
+    }
+  },
+  {
+    "description": "Whitespace-varying duplicate of approved mapping (should normalize and detect duplicate)",
+    "mapping": {
+      "vendor": "Cisco",
+      "platform": "cisco_ios",
+      "command_pattern": "   IP   SSH   VERSION   2   ",
+      "meaning": "Varying whitespace and case duplicate of SSHv2 enforcement",
+      "security_control": "secure_ssh_version",
+      "mapped_rule_id": "NET-002",
+      "explanation": "Whitespace and case variation test case.",
+      "confidence": 0.80,
+      "source": "ai_agent",
+      "approval_status": "approved"
+    }
+  },
+  {
+    "description": "Same command on a different platform (should succeed because platform is isolated)",
+    "mapping": {
+      "vendor": "Cisco",
+      "platform": "cisco_nxos",
+      "command_pattern": "ip ssh version 2",
+      "meaning": "NX-OS SSH version 2 enforcement",
+      "security_control": "secure_ssh_version",
+      "mapped_rule_id": "NET-002",
+      "explanation": "NX-OS distinct platform test case.",
+      "confidence": 0.95,
+      "source": "human",
+      "approval_status": "approved"
+    }
+  }
+]
