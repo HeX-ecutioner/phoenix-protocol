@@ -1,0 +1,3 @@
+# Phoenix Protocol - Backend Track 2 Dependencies
+# Kept strictly minimal: standard library used for app core (sqlite3, dataclasses, typing, etc.)
+pytest>=8.0.0
