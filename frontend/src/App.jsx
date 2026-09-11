@@ -5,6 +5,7 @@ import { UploadPage } from './pages/UploadPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DevicePage } from './pages/DevicePage';
 import { AboutPage } from './pages/AboutPage';
+import { PolicyPage } from './pages/PolicyPage';
 import './styles/app.css';
 
 function AnimatedRoutes() {
@@ -15,6 +16,9 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<UploadPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/cookies" element={<PolicyPage type="cookies" />} />
+        <Route path="/terms" element={<PolicyPage type="terms" />} />
+        <Route path="/privacy" element={<PolicyPage type="privacy" />} />
         <Route path="/scans/:scanId" element={<DashboardPage />} />
         <Route path="/scans/:scanId/devices/:deviceId" element={<DevicePage />} />
       </Routes>
