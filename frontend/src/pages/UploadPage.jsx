@@ -7,35 +7,49 @@ import { Features } from '../components/Features';
 import { ScanNotes } from '../components/ScanNotes';
 import { Footer } from '../components/Footer';
 import { PageTransition } from '../components/motion/PageTransition';
+import { LoadingScreen } from '../components/motion/LoadingScreen';
 import { Marquee } from '../components/motion/Marquee';
 import { InventoryScroll } from '../components/InventoryScroll';
 
 export function UploadPage() {
-  const [isHeroLoaded, setIsHeroLoaded] = React.useState(false);
   const location = useLocation();
+  const [showLoader, setShowLoader] = React.useState(Boolean(location.state?.showLoader));
+  const [isHeroLoaded, setIsHeroLoaded] = React.useState(false);
+  const [heroKey, setHeroKey] = React.useState(1);
 
   React.useEffect(() => {
-    if (location.hash === '#upload-section' || location.state?.scrollToUpload) {
-      setIsHeroLoaded(true);
-      const timer = setTimeout(() => {
-        const el = document.getElementById('upload-section');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 250);
-      return () => clearTimeout(timer);
+    if (location.state?.showLoader) {
+      window.scrollTo(0, 0);
+      setShowLoader(true);
+      setIsHeroLoaded(false);
+      setHeroKey(prev => prev + 1);
+    } else {
+      window.scrollTo(0, 0);
     }
   }, [location]);
+
+  const handleLoadingComplete = () => {
+    setShowLoader(false);
+    setIsHeroLoaded(true);
+  };
 
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col w-full bg-obsidian">
-        <div className={`fixed top-0 w-full z-50 transition-opacity duration-1000 ${isHeroLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {showLoader && (
+          <LoadingScreen 
+            onComplete={handleLoadingComplete} 
+            duration={1800} 
+            message="INITIALIZING SECURE SCANNER CONSOLE"
+          />
+        )}
+
+        <div className={`fixed top-0 w-full z-50 transition-opacity duration-1000 ${isHeroLoaded && !showLoader ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <Navbar />
         </div>
         
         <main className="flex-1 w-full relative z-10">
-          <Hero onLoadComplete={() => setIsHeroLoaded(true)} />
+          <Hero key={heroKey} onLoadComplete={() => setIsHeroLoaded(true)} />
           
           <div id="upload-section" className="min-h-screen flex items-center justify-center">
             <ScannerConsole />

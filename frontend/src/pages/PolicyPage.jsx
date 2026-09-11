@@ -180,10 +180,11 @@ export function PolicyPage({ type = 'cookies' }) {
             </button>
 
             <Link 
-              to="/#upload-section"
+              to="/"
+              state={{ showLoader: true }}
               className="inline-flex items-center gap-3 px-6 py-3.5 bg-brand-orange hover:bg-orange-500 text-white font-mono text-xs font-black tracking-widest uppercase transition-colors shadow-lg"
             >
-              <span>RETURN TO SCANNER // UPLOAD</span>
+              <span>RETURN TO SCANNER</span>
               <Terminal className="w-4 h-4" />
             </Link>
           </section>
