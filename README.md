@@ -6,6 +6,32 @@
 
 > **Phoenix Protocol is a web application that turns complex network configurations into clear security findings and practical remediation steps.**
 
+## Quick Start
+
+Start both the Flask backend and Vite frontend with a single cross-platform command:
+
+```bash
+python start.py
+```
+
+This launcher:
+1. Verifies that Python and Node/npm runtimes and dependencies are installed.
+2. Starts the Flask backend on `http://localhost:5000`.
+3. Starts the Vite frontend on `http://localhost:5173`.
+4. Performs readiness polling on `/health` and frontend root until both services are fully responsive.
+5. Automatically opens the frontend in your default browser (pass `--no-browser` to disable).
+6. Gracefully stops both child processes on `Ctrl+C`.
+
+### Launcher Options
+
+```bash
+# Start services without auto-opening the web browser
+python start.py --no-browser
+
+# Run on custom ports if needed
+python start.py --port-backend 5000 --port-frontend 5173
+```
+
 ## What the Project Does
 
 A user uploads a configuration from a network device. Phoenix Protocol identifies the device vendor and platform, interprets the configuration, converts it into a common security format, and evaluates it against selected compliance rules.
