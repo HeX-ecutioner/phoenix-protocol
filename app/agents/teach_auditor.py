@@ -12,9 +12,16 @@ import os
 import re
 from typing import Any, Callable, Dict, List, Optional, Union
 
-from google.adk.agents.llm_agent import Agent
-from google.adk.runners import InMemoryRunner
-from google.genai import types
+try:
+    from google.adk.agents.llm_agent import Agent
+    from google.adk.runners import InMemoryRunner
+    from google.genai import types
+    ADK_AVAILABLE = True
+except ImportError:
+    Agent = Any  # type: ignore
+    InMemoryRunner = Any  # type: ignore
+    types = None  # type: ignore
+    ADK_AVAILABLE = False
 
 from app.agents.knowledge import KnowledgeProvider, MockKnowledgeProvider
 from app.agents.schemas import (
@@ -82,8 +89,11 @@ def make_lookup_tool(
 def build_teach_auditor_agent(
     knowledge_provider: Optional[KnowledgeProvider] = None,
     model: str = "gemini-2.0-flash",
-) -> Agent:
+) -> Optional[Any]:
     """Build and configure the single Google ADK Teach-the-Auditor Agent."""
+    if not ADK_AVAILABLE:
+        return None
+
     provider = knowledge_provider if knowledge_provider is not None else MockKnowledgeProvider()
     lookup_tool = make_lookup_tool(provider)
 
