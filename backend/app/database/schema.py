@@ -80,6 +80,19 @@ CREATE INDEX IF NOT EXISTS idx_devices_scan_id ON devices(scan_id);
 CREATE INDEX IF NOT EXISTS idx_rule_results_scan_id ON rule_results(scan_id);
 CREATE INDEX IF NOT EXISTS idx_rule_results_device_id ON rule_results(device_id);
 CREATE INDEX IF NOT EXISTS idx_rule_results_rule_id ON rule_results(rule_id);
+
+CREATE TABLE IF NOT EXISTS contact_submissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticket_id TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'received'
+);
+
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_ticket_id ON contact_submissions(ticket_id);
 """
 
 

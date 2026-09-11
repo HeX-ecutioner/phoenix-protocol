@@ -672,3 +672,51 @@ def get_full_scan_dict(
         "compliance_score": scan_summary.tested_rule_compliance,
         "devices": devices_output,
     }
+
+
+class ContactSubmissionRepository:
+    """Repository managing contact submissions using parameterized queries."""
+
+    def __init__(self, conn: sqlite3.Connection):
+        self.conn = conn
+
+    def create(
+        self,
+        ticket_id: str,
+        name: str,
+        email: str,
+        subject: str,
+        message: str,
+        status: str = "received",
+    ) -> Dict[str, Any]:
+        """Insert a contact submission using parameterized query."""
+        cursor = self.conn.execute(
+            """
+            INSERT INTO contact_submissions (
+                ticket_id, name, email, subject, message, status
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (ticket_id, name, email, subject, message, status),
+        )
+        self.conn.commit()
+        row_id = cursor.lastrowid
+        return {
+            "id": row_id,
+            "ticket_id": ticket_id,
+            "name": name,
+            "email": email,
+            "subject": subject,
+            "message": message,
+            "status": status,
+        }
+
+    def get_by_ticket_id(self, ticket_id: str) -> Optional[Dict[str, Any]]:
+        """Fetch a contact submission by ticket_id."""
+        cursor = self.conn.execute(
+            "SELECT id, ticket_id, name, email, subject, message, created_at, status FROM contact_submissions WHERE ticket_id = ?",
+            (ticket_id,),
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return dict(row)
