@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian: #07080a;
+  --color-brand-orange: #EA5814;
+  --color-dark-slate: #0a0b0d;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-obsidian);
+    color: white;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Base custom animations & specific non-tailwind classes */
+@layer utilities {
+  .bg-grid {
+    background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  
+  .bg-radial-glow {
+    background: radial-gradient(circle at center, rgba(226, 68, 35, 0.15) 0%, transparent 60%);
+  }
+  
+  .glass-card {
+    @apply bg-neutral-900/60 border border-neutral-800/80 backdrop-blur-md rounded-lg;
+  }
+}
