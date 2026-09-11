@@ -76,19 +76,28 @@ class MockKnowledgeProvider(KnowledgeProvider):
         return list(self._mappings.values())
 
 
-def _ensure_dev2_on_path() -> None:
-    """Ensure the Developer 2 package directory ('dev 2 part') is in sys.path."""
-    import sys
-    from pathlib import Path
+def _ensure_knowledge_service() -> type:
+    """Import and return the KnowledgeService class from the knowledge package."""
+    try:
+        from knowledge.services.knowledge_service import KnowledgeService
+        return KnowledgeService
+    except ImportError:
+        import sys
+        from pathlib import Path
 
-    repo_root = Path(__file__).resolve().parent.parent.parent
-    dev2_dir = repo_root / "dev 2 part"
-    if dev2_dir.is_dir() and str(dev2_dir) not in sys.path:
-        sys.path.insert(0, str(dev2_dir))
+        backend_dir = Path(__file__).resolve().parent.parent.parent
+        if str(backend_dir) not in sys.path:
+            sys.path.insert(0, str(backend_dir))
+        try:
+            from knowledge.services.knowledge_service import KnowledgeService
+            return KnowledgeService
+        except ImportError:
+            from services.knowledge_service import KnowledgeService  # type: ignore
+            return KnowledgeService
 
 
 class Dev2KnowledgeProvider(KnowledgeProvider):
-    """Adapter connecting Teach-the-Auditor to Dev2's persistent KnowledgeService.
+    """Adapter connecting Teach-the-Auditor to the persistent KnowledgeService.
 
     Architecture:
       TeachAuditorService -> KnowledgeProvider -> Dev2KnowledgeProvider -> KnowledgeService -> SQLite
@@ -112,8 +121,7 @@ class Dev2KnowledgeProvider(KnowledgeProvider):
             conn: Optional SQLite connection to pass to KnowledgeService.
             db_path: Optional file path for the knowledge SQLite database.
         """
-        _ensure_dev2_on_path()
-        from services.knowledge_service import KnowledgeService
+        KnowledgeService = _ensure_knowledge_service()
 
         if service is not None:
             self._service = service

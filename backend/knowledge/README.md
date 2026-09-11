@@ -142,18 +142,10 @@ Developer 1 should import and use **only** the high-level `KnowledgeService` or 
 
 ### Supported Import Patterns
 
-Because the isolated folder name `dev 2 part` contains spaces, callers outside the package add the directory to `sys.path` or import by file path:
+The `knowledge` package is a standard Python package under `backend/`:
 
 ```python
-from pathlib import Path
-import sys
-
-# Add 'dev 2 part' to sys.path
-package_dir = Path(__file__).resolve().parent / "dev 2 part"
-if str(package_dir) not in sys.path:
-    sys.path.insert(0, str(package_dir))
-
-from services.knowledge_service import KnowledgeService
+from knowledge.services.knowledge_service import KnowledgeService
 
 service = KnowledgeService(db_path="knowledge.db")
 ```
@@ -206,20 +198,20 @@ approved_rules = service.list_approved_knowledge(vendor="Cisco")
 
 ## 10. How to Run Tests
 
-From the repository root:
+From the `backend/` directory:
 
 ```bash
-# Run Dev2 isolated test suite (40 tests)
-python -m pytest -v "dev 2 part/tests"
+# Run knowledge isolated test suite (44 tests)
+python -m pytest -v knowledge/tests
 
 # Run compileall check
-python -m compileall "dev 2 part"
+python -m compileall knowledge
 
 # Run code style and linter checks
-python -m flake8 "dev 2 part"
-python -m black --check "dev 2 part"
+python -m flake8 knowledge
+python -m black --check knowledge
 
-# Run core Phoenix Protocol test suite (93 tests)
+# Run core backend test suite (133 tests)
 python -m pytest -v tests
 ```
 

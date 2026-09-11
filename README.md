@@ -134,36 +134,57 @@ This demonstrates both the practical security value and the adaptive agentic cap
 
 > **Rise above configuration complexity. Secure every network.**
 
-## Backend API & Developer Documentation
+## Monorepo Architecture
 
-### Installation & Environment Setup
+The repository is organized into dedicated top-level workspaces:
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+```text
+phoenix-protocol/
+│
+├── frontend/   # React/Vite single-page application & dashboard UI
+│   ├── src/    # Components, pages, motion effects, and styling
+│   ├── public/ # Static assets and branding
+│   └── package.json
+│
+└── backend/    # Flask REST API, scanner engine, AI agents, and knowledge base
+    ├── app/               # Authoritative backend application package
+    │   ├── api/           # Flask REST API routes (/health, /scan)
+    │   ├── services/      # Scanner and compliance service
+    │   ├── parsers/       # Network configuration parsers
+    │   ├── rules/         # NET-001..NET-010 deterministic rules
+    │   └── agents/        # Teach-the-Auditor & remediation agents
+    ├── knowledge/         # Persistent Teach-the-Auditor knowledge layer
+    ├── examples/          # Executable end-to-end integration demo
+    ├── sample_data/       # Network configuration test fixtures
+    ├── tests/             # Automated test suite (177 tests)
+    └── requirements.txt   # Python runtime and test dependencies
 ```
 
-### Running Tests
+### Quickstart
+
+#### 1. Backend Service
+For full backend documentation, architecture details, and endpoint contracts, see [`backend/README.md`](backend/README.md).
 
 ```bash
-# Run complete test suite (Track 2 core + Flask API)
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+# Run the Flask API server (port 5000)
+flask --app "app.api:create_app()" run --port 5000
+
+# Run full backend test suite
 python -m pytest -v
 ```
 
-### Running the Flask API Server
+#### 2. Frontend Application
+For frontend details, see [`frontend/README.md`](frontend/README.md).
 
 ```bash
-# Run using Flask CLI
-flask --app "app.api:create_app()" run --port 5000
-```
-
-Or programmatically in Python:
-```python
-from app.api import create_app
-
-app = create_app()
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+cd frontend
+npm install
+npm run dev
 ```
 
 ### API Endpoints
