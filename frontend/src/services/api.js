@@ -6,22 +6,36 @@ import {
   MOCK_DEVICE_RESULTS
 } from '../data/mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
-const USE_MOCK = true; // Set to false to use real backend once available
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 export async function apiRequest(path, options = {}) {
   if (USE_MOCK) {
     return handleMockRequest(path, options);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, options);
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, options);
+  } catch (networkErr) {
+    const error = new Error(
+      `Cannot connect to Phoenix Protocol backend at ${API_BASE_URL}. Ensure the backend service is running.`
+    );
+    error.status = 0;
+    error.code = "NETWORK_ERROR";
+    error.details = [networkErr.message];
+    throw error;
+  }
+
   const body = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const message = body?.error?.message || "The request could not be completed.";
+    const message =
+      body?.error?.message ||
+      `Request failed with status ${response.status} (${response.statusText || "Error"}).`;
     const error = new Error(message);
     error.status = response.status;
-    error.code = body?.error?.code;
+    error.code = body?.error?.code || `HTTP_${response.status}`;
     error.details = body?.error?.details || [];
     throw error;
   }
@@ -87,10 +101,15 @@ export async function getDeviceTypes() {
   return apiRequest('/api/device-types');
 }
 
-export async function createScan(deviceType, files) {
+export async function createScan(deviceType = "cisco_ios", files = []) {
   const formData = new FormData();
-  formData.append("device_type", deviceType);
-  files.forEach((file) => formData.append("files", file));
+  formData.append("device_type", deviceType || "cisco_ios");
+
+  if (Array.isArray(files)) {
+    files.forEach((file) => formData.append("files", file));
+  } else if (files) {
+    formData.append("files", files);
+  }
 
   return apiRequest("/api/scans", {
     method: "POST",
@@ -107,8 +126,15 @@ export async function getDevices(scanId) {
 }
 
 export async function getDevice(scanId, deviceId, filters = {}) {
-  // Note: filters not fully implemented in mock, but parameter included as requested
-  return apiRequest(`/api/scans/${scanId}/devices/${deviceId}`);
+  const response = await apiRequest(`/api/scans/${scanId}/devices/${deviceId}`);
+  // Normalize response: ensure response.data.device is consistently present
+  if (response?.data && !response.data.device) {
+    response.data = {
+      ...response.data,
+      device: response.data,
+    };
+  }
+  return response;
 }
 
 export async function getRules(filters = {}) {
@@ -125,4 +151,21 @@ export function getCsvReportUrl(scanId) {
 
 export function getHtmlReportUrl(scanId) {
   return `${API_BASE_URL}/api/scans/${scanId}/report.html`;
+}
+
+export async function downloadCsvReport(scanId) {
+  const url = getCsvReportUrl(scanId);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to download CSV report: status ${response.status} (${response.statusText || 'Error'})`);
+  }
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = downloadUrl;
+  a.download = `scan_${scanId}_report.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(downloadUrl);
 }

@@ -44,11 +44,18 @@ The frontend connects to the backend API endpoints as described in the API speci
 - `GET /api/rules`
 - `GET /api/scans/{scan_id}/report.csv`
 
-The application uses an integrated mock mode if the real backend is unavailable, ensuring development and demonstrations can proceed using synthetic responses that exactly match the backend contract.
+### Real API Mode vs Mock Mode
+
+By default, the frontend operates in **Real API Mode** communicating with the Flask backend on `http://localhost:5000` (or `VITE_API_BASE_URL`). The application will **never** silently fall back to mock data if the backend is down; instead, an honest connection error will be displayed.
+
+To enable mock mode for isolated UI development without running the backend, explicitly set:
+```bash
+VITE_USE_MOCK=true
+```
 
 ## Known Limitations
 
 - **Authentication**: No authentication or authorization is implemented in the MVP.
-- **Report Download**: HTML report download is omitted in the initial UI per backend capability checks, though the endpoint exists in the API. CSV reports use standard anchor download links.
-- **Rules View**: The standalone rules catalog library has been integrated into the device details view for efficiency during MVP execution, but a dedicated rules library view could be expanded in the future.
-- **Progress Tracking**: Scan requests are synchronous, so true progress tracking is not available. Fake percentages are avoided by design.
+- **Report Download**: Authoritative CSV compliance report download is provided via `/api/scans/{scan_id}/report.csv`.
+- **Supported Targets**: Cisco IOS configurations are actively supported in the MVP; architecture is extensible for additional vendors.
+- **Progress Tracking**: Scan requests are executed synchronously by the deterministic compliance engine; fake progress bars are avoided by design.
