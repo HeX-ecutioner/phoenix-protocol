@@ -1,25 +1,128 @@
 """Manual API verification script testing live endpoints against fixtures."""
 
+from pathlib import Path
 import requests
+
+SAMPLE_DATA_DIR = Path(__file__).resolve().parent.parent / "sample_data"
 
 url = "http://127.0.0.1:5000/scan"
 
+
 def run_manual_tests():
     test_cases = [
-        ("1. Compliant Router", [("files", ("compliant.txt", open("sample_data/compliant_router.txt", "rb"), "text/plain"))]),
-        ("2. Failing Router", [("files", ("failing.txt", open("sample_data/failing_router.txt", "rb"), "text/plain"))]),
-        ("3. Ambiguous Router", [("files", ("ambiguous.txt", open("sample_data/ambiguous_router.txt", "rb"), "text/plain"))]),
-        ("4. Garbage Input", [("files", ("garbage.txt", open("sample_data/edge_cases/garbage.txt", "rb"), "text/plain"))]),
-        ("5. Secret Fixture (Mixed)", [("files", ("mixed_secrets.txt", open("sample_data/security/mixed_secrets.txt", "rb"), "text/plain"))]),
+        (
+            "1. Compliant Router",
+            [
+                (
+                    "files",
+                    (
+                        "compliant.txt",
+                        open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb"),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
+        (
+            "2. Failing Router",
+            [
+                (
+                    "files",
+                    (
+                        "failing.txt",
+                        open(SAMPLE_DATA_DIR / "failing_router.txt", "rb"),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
+        (
+            "3. Ambiguous Router",
+            [
+                (
+                    "files",
+                    (
+                        "ambiguous.txt",
+                        open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "rb"),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
+        (
+            "4. Garbage Input",
+            [
+                (
+                    "files",
+                    (
+                        "garbage.txt",
+                        open(SAMPLE_DATA_DIR / "edge_cases/garbage.txt", "rb"),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
+        (
+            "5. Secret Fixture (Mixed)",
+            [
+                (
+                    "files",
+                    (
+                        "mixed_secrets.txt",
+                        open(SAMPLE_DATA_DIR / "security/mixed_secrets.txt", "rb"),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
         (
             "6. Multi-File Scan",
             [
-                ("files", ("compliant.txt", open("sample_data/compliant_router.txt", "rb"), "text/plain")),
-                ("files", ("failing.txt", open("sample_data/failing_router.txt", "rb"), "text/plain")),
-                ("files", ("secondary.txt", open("sample_data/scenarios/multi_device_secondary.txt", "rb"), "text/plain")),
+                (
+                    "files",
+                    (
+                        "compliant.txt",
+                        open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb"),
+                        "text/plain",
+                    ),
+                ),
+                (
+                    "files",
+                    (
+                        "failing.txt",
+                        open(SAMPLE_DATA_DIR / "failing_router.txt", "rb"),
+                        "text/plain",
+                    ),
+                ),
+                (
+                    "files",
+                    (
+                        "secondary.txt",
+                        open(
+                            SAMPLE_DATA_DIR / "scenarios/multi_device_secondary.txt",
+                            "rb",
+                        ),
+                        "text/plain",
+                    ),
+                ),
             ],
         ),
-        ("7. Remediation Demo", [("files", ("remediation.txt", open("sample_data/scenarios/remediation_demo.txt", "rb"), "text/plain"))]),
+        (
+            "7. Remediation Demo",
+            [
+                (
+                    "files",
+                    (
+                        "remediation.txt",
+                        open(
+                            SAMPLE_DATA_DIR / "scenarios/remediation_demo.txt",
+                            "rb",
+                        ),
+                        "text/plain",
+                    ),
+                )
+            ],
+        ),
     ]
 
     print("=" * 80)
@@ -37,10 +140,14 @@ def run_manual_tests():
                 print(f"  Compliance Score: {data.get('compliance_score')}%")
                 print(f"  Devices Count:    {len(data.get('devices', []))}")
                 for dev in data.get("devices", []):
-                    print(f"    * Device: {dev.get('name')} (source: {dev.get('source_filename')})")
+                    print(
+                        f"    * Device: {dev.get('name')} (source: {dev.get('source_filename')})"
+                    )
                     print(f"      Parse Status: {dev.get('parse_status')}")
                     print(f"      Score:        {dev.get('compliance_score')}%")
-                    print(f"      Rules:        P:{dev.get('summary', {}).get('passed_rules')} F:{dev.get('summary', {}).get('failed_rules')} W:{dev.get('summary', {}).get('warning_rules')} E:{dev.get('summary', {}).get('error_rules')}")
+                    print(
+                        f"      Rules:        P:{dev.get('summary', {}).get('passed_rules')} F:{dev.get('summary', {}).get('failed_rules')} W:{dev.get('summary', {}).get('warning_rules')} E:{dev.get('summary', {}).get('error_rules')}"
+                    )
             else:
                 print(f"  Error: {resp.text}")
         except Exception as err:

@@ -1,11 +1,17 @@
 """Validation script to evaluate all sample_data fixtures against parser and scanner."""
 
 import pathlib
+import sys
+
+BACKEND_DIR = pathlib.Path(__file__).resolve().parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
 from app.services.scanner import run_scan
 
 import uuid
 
-sample_dir = pathlib.Path("sample_data")
+sample_dir = pathlib.Path(__file__).resolve().parent.parent / "sample_data"
 files = sorted([f for f in sample_dir.rglob("*.txt")])
 
 print(f"Total fixtures found: {len(files)}")

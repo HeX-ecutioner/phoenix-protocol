@@ -2,11 +2,14 @@
 
 import io
 import os
+from pathlib import Path
 import sqlite3
 import tempfile
 from typing import Generator
 import pytest
 from flask.testing import FlaskClient
+
+SAMPLE_DATA_DIR = Path(__file__).resolve().parent.parent / "sample_data"
 
 from app.api import create_app
 from app.database.connection import get_connection
@@ -62,7 +65,7 @@ def test_get_health(app_and_db):
 # 2. Compliant config upload
 def test_post_scan_compliant_config(app_and_db):
     """Verify POST /scan with compliant router yields 201 and 100% compliance."""
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         content = f.read()
 
     res = app_and_db.post(
@@ -95,7 +98,7 @@ def test_post_scan_compliant_config(app_and_db):
 # 3. Failing config upload
 def test_post_scan_failing_config(app_and_db):
     """Verify POST /scan with failing router yields 201 and 0% compliance."""
-    with open("sample_data/failing_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "rb") as f:
         content = f.read()
 
     res = app_and_db.post(
@@ -116,7 +119,7 @@ def test_post_scan_failing_config(app_and_db):
 # 4. Ambiguous config upload
 def test_post_scan_ambiguous_config(app_and_db):
     """Verify POST /scan with ambiguous router preserves warnings and excludes from denominator."""
-    with open("sample_data/ambiguous_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "rb") as f:
         content = f.read()
 
     res = app_and_db.post(
@@ -141,9 +144,9 @@ def test_post_scan_ambiguous_config(app_and_db):
 # 5. Multiple config files upload
 def test_post_scan_multiple_configs(app_and_db):
     """Verify POST /scan accepts multiple configuration files and aggregates results."""
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         comp_bytes = f.read()
-    with open("sample_data/failing_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "rb") as f:
         fail_bytes = f.read()
 
     res = app_and_db.post(
@@ -243,7 +246,7 @@ def test_get_scan_by_id_and_not_found(app_and_db):
     assert "Scan not found" in res_not_found.get_json()["error"]
 
     # 2. Upload scan
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         content = f.read()
 
     create_res = app_and_db.post(
@@ -269,7 +272,7 @@ def test_get_scan_by_id_and_not_found(app_and_db):
 # 13 & 14. Response schema verification
 def test_scan_response_schema_contract(app_and_db):
     """Verify response schema contains all required top-level and device-level contract keys."""
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         content = f.read()
 
     res = app_and_db.post(
@@ -367,11 +370,11 @@ def test_secrets_and_raw_config_never_appear_in_response(app_and_db):
 # 17 & 18. Multi-file to multi-device correspondence
 def test_one_file_one_device_mapping(app_and_db):
     """Verify 1 uploaded file creates exactly 1 device, 3 files create 3 devices."""
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         c1 = f.read()
-    with open("sample_data/failing_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "failing_router.txt", "rb") as f:
         c2 = f.read()
-    with open("sample_data/ambiguous_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "ambiguous_router.txt", "rb") as f:
         c3 = f.read()
 
     # 1 file -> 1 device
@@ -400,7 +403,7 @@ def test_one_file_one_device_mapping(app_and_db):
 # 19 & 20. Track 2 scanner invocation and summary alignment
 def test_api_invokes_authoritative_track2_scanner(app_and_db):
     """Verify the API invokes the authoritative Track 2 engine with rules NET-001 through NET-010."""
-    with open("sample_data/compliant_router.txt", "rb") as f:
+    with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
         content = f.read()
 
     res = app_and_db.post(
@@ -441,9 +444,9 @@ def test_critical_end_to_end_chain(db_path):
     """
     app = create_app(db_path=db_path, test_config={"TESTING": True})
     with app.test_client() as client:
-        with open("sample_data/compliant_router.txt", "rb") as f:
+        with open(SAMPLE_DATA_DIR / "compliant_router.txt", "rb") as f:
             comp_content = f.read()
-        with open("sample_data/failing_router.txt", "rb") as f:
+        with open(SAMPLE_DATA_DIR / "failing_router.txt", "rb") as f:
             fail_content = f.read()
 
         # 1. Execute HTTP upload
