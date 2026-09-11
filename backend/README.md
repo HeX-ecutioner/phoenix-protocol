@@ -1,6 +1,8 @@
 # Phoenix Protocol — Backend Engine
 
-The backend for Phoenix Protocol is an adaptive, agentic network security compliance auditor for heterogeneous network-device configurations.
+The backend for Phoenix Protocol is an adaptive, agentic network security compliance auditor for network-device configurations.
+
+---
 
 ## Architecture
 
@@ -21,7 +23,7 @@ NET-001 through NET-010 Rule Evaluations
         ↓
 SQLite Persistence (phoenix_protocol.db)
         ↓
-API Response / AI Intelligence Enrichment (backend/app/agents/)
+REST API Response / CSV Report / AI Intelligence Enrichment (backend/app/agents/)
 ```
 
 ### Core Separation of Concerns
@@ -37,28 +39,55 @@ API Response / AI Intelligence Enrichment (backend/app/agents/)
 
 ---
 
+## MVP Scope: Implemented vs Extensible
+
+### Currently Implemented Support (Frozen & Authoritative)
+- **Vendor & Device Support**: Cisco IOS (`cisco_ios` profile) configuration parsing.
+- **Compliance Rules**: Deterministic rules `NET-001` through `NET-010` covering administrative access, encryption, authentication, logging, NTP, and security banners.
+- **Scoring Engine**: Tested-rule compliance score formula: $\text{score} = \frac{\text{pass}}{\text{pass} + \text{fail}} \times 100\%$, with warnings, errors, and N/A excluded from denominator.
+- **Evidence & Line Range**: Line-referenced configuration evidence with automatic credential/secret sanitization.
+- **Persistence**: Parameterized SQLite storage (`scans`, `devices`, `rules`, `rule_results`).
+- **Reports**: Deterministic, formula-injection-safe CSV export (`/api/scans/{scan_id}/report.csv`).
+- **Security**: Secret redaction (`[REDACTED]`), zero raw config persistence, zero shell/exec/subprocess execution.
+- **Local API**: Unauthenticated REST API for local hackathon integration.
+
+### Architectural Extensibility (Future Milestones)
+- **Multi-Vendor Expansion**: Parser abstraction (`NormalizedConfig`) is architecturally extensible to Cisco NX-OS, Juniper Junos, Arista EOS, and Palo Alto PAN-OS.
+- **Enterprise Authentication & RBAC**: JWT, OAuth2, and multi-tenant access control.
+- **Expanded Rule Frameworks**: Extension to full CIS Benchmark, NIST SP 800-53, and DISA STIG catalogs.
+- **Active Device Retrieval**: Direct SSH/NETCONF collectors (intentionally disabled in MVP).
+
+---
+
 ## Directory Structure
 
 ```text
 backend/
 ├── app/                  # Core application package
 │   ├── agents/           # Google ADK agent intelligence layer
-│   ├── api/              # Flask application factory and REST endpoints
+│   ├── api/              # Flask REST endpoints and CORS adapter
 │   ├── database/         # SQLite persistence repository and schema
 │   ├── models/           # Pydantic and dataclass models
 │   ├── parsers/          # Network configuration parsers
 │   ├── rules/            # Deterministic compliance rules (NET-001..NET-010)
 │   ├── security/         # Secret redaction and evidence sanitization
 │   └── services/         # Scanner and compliance calculation services
+├── examples/             # Executable demos and integration scripts
+│   ├── phoenix_end_to_end_demo.py
+│   ├── verify_integration_flow.py
+│   └── run_live_http_verification.py
 ├── knowledge/            # Persistent Teach-the-Auditor knowledge layer
 │   ├── models/           # KnowledgeMapping models
 │   ├── services/         # KnowledgeService approval workflow
 │   ├── storage/          # SQLite knowledge repository
 │   ├── validation/       # Command normalization and secret sanitization
 │   └── tests/            # Knowledge layer test suite
-├── examples/             # Executable demos (phoenix_end_to_end_demo.py)
 ├── sample_data/          # Comprehensive QA and demo configuration fixtures
-├── tests/                # Automated pytest test suite (177 tests)
+├── tests/                # Automated pytest test suite (195 tests)
+│   ├── test_api_v2.py    # Authoritative /api/... REST contract test suite
+│   ├── test_api.py       # Legacy API route test suite
+│   └── ...
+├── INTEGRATION_CONTRACT.md # Formal API contract specification for frontend
 ├── .env.example          # Environment variable template
 ├── .flake8               # Flake8 linter configuration
 ├── pyrightconfig.json    # Pyright type checker configuration
@@ -92,13 +121,11 @@ From the `backend/` directory:
 flask --app "app.api:create_app()" run --port 5000
 ```
 
-Or programmatically in Python:
-```python
-from app.api import create_app
-
-app = create_app()
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+### CORS Configuration
+By default, the backend allows local development origins (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`).
+To configure custom origins, set the environment variable:
+```bash
+export CORS_ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
 ```
 
 ---
@@ -108,13 +135,11 @@ if __name__ == "__main__":
 From the `backend/` directory:
 
 ```bash
-# Run full backend test suite
+# Run full backend test suite (194 passing)
 python -m pytest -v
 
-# Run targeted AI and knowledge layer test suites
-python -m pytest -v tests/test_teach_auditor.py
-python -m pytest -v tests/test_ai_integration.py
-python -m pytest -v knowledge/tests
+# Run new /api contract tests
+python -m pytest -v tests/test_api_v2.py
 
 # Bytecode compilation check
 python -m compileall app tests knowledge
@@ -122,39 +147,28 @@ python -m compileall app tests knowledge
 
 ---
 
-## End-to-End Demo
+## Authoritative Frontend API Endpoints
 
-Run the self-contained 13-step terminal demonstration illustrating deterministic scanning, finding explanations, advisory remediation, unfamiliar command interpretation, human approval, and cached knowledge retrieval:
+All new frontend integrations target `/api/...`. Every endpoint returns a structured envelope:
 
-```bash
-python examples/phoenix_end_to_end_demo.py
-```
-
----
-
-## API Endpoints
-
-### 1. `GET /health`
-Returns service operational health metadata.
-
-**Response (200 OK):**
 ```json
 {
-  "status": "healthy",
-  "service": "phoenix-protocol",
-  "version": "1.0.0"
+  "data": { ... },
+  "error": null,
+  "request_id": "req-..."
 }
 ```
 
-### 2. `POST /scan`
-Uploads one or more network device configuration files and triggers deterministic compliance analysis.
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/device-types` | Returns list of supported device profiles (`cisco_ios`). |
+| `POST` | `/api/scans` | Multipart configuration upload and compliance scan execution. |
+| `GET` | `/api/scans/{scan_id}` | Retrieves full persisted scan results and metrics. |
+| `GET` | `/api/scans/{scan_id}/devices` | Lists devices evaluated in the scan. |
+| `GET` | `/api/scans/{scan_id}/devices/{device_id}` | Retrieves complete device audit and rule findings. |
+| `GET` | `/api/rules` | Retrieves catalog of active rules (`NET-001` through `NET-010`). |
+| `GET` | `/api/rules/{rule_id}` | Retrieves metadata for a single compliance rule. |
+| `GET` | `/api/scans/{scan_id}/report.csv` | Downloads spreadsheet-safe, sanitized CSV report. |
+| `GET` | `/health` / `/api/health` | Service health status check. |
 
-- **Content-Type**: `multipart/form-data`
-- **Form Parameters**:
-  - `file` or `files`: One or more configuration files (up to 10 MB each).
-  - `device_type` (optional): Requested device profile (default: `cisco_ios`).
-
-**Response (201 Created):** Standard Phoenix Protocol scan JSON payload containing device findings, evidence snippets, compliance score, and summary statistics.
-
-### 3. `GET /scan/<scan_id>`
-Retrieves a previously evaluated scan by its unique scan ID directly from SQLite persistence.
+For detailed payloads, request parameters, and error responses, see [INTEGRATION_CONTRACT.md](INTEGRATION_CONTRACT.md).
