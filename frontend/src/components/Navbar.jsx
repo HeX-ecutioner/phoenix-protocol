@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 export function Navbar() {
   const location = useLocation();
-  const isAbout = location.pathname === '/about';
+  const isSubpage = location.pathname !== '/';
 
   return (
     <nav className="w-full flex items-center justify-between px-6 py-4 bg-obsidian/80 backdrop-blur-md sticky top-0 z-50">
@@ -25,7 +25,7 @@ export function Navbar() {
         <Link 
           to="/about" 
           className={`transition-colors text-xs font-bold tracking-widest uppercase ${
-            isAbout ? 'text-brand-orange' : 'text-neutral-400 hover:text-brand-orange'
+            location.pathname === '/about' ? 'text-brand-orange' : 'text-neutral-400 hover:text-brand-orange'
           }`}
         >
           ABOUT SPEC
@@ -38,23 +38,24 @@ export function Navbar() {
         </Link>
       </div>
 
-      {/* Right: Action button navigating to About Page */}
+      {/* Right: Action button navigating to About Page or Back to Upload Scanner */}
       <div className="flex items-center">
         <Link 
-          to={isAbout ? "/" : "/about"} 
+          to={isSubpage ? "/#upload-section" : "/about"} 
+          state={isSubpage ? { scrollToUpload: true } : undefined}
           className={`flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border transition-all duration-300 group ${
-            isAbout 
+            isSubpage 
               ? 'border-brand-orange/60 bg-brand-orange/10 shadow-[0_0_20px_rgba(234,88,20,0.2)]' 
               : 'border-neutral-800 hover:border-neutral-600 bg-black/40 hover:bg-neutral-900/60'
           }`}
         >
           <span className={`text-xs font-bold tracking-[0.2em] uppercase transition-colors ${
-            isAbout ? 'text-brand-orange' : 'text-white'
+            isSubpage ? 'text-brand-orange' : 'text-white'
           }`}>
-            {isAbout ? 'BACK TO SCANNER' : 'READ-ONLY MODE'}
+            {isSubpage ? 'BACK TO SCANNER' : 'READ-ONLY MODE'}
           </span>
           <div className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center group-hover:scale-105 transition-transform">
-            {isAbout ? (
+            {isSubpage ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
