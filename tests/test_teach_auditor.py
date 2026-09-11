@@ -313,6 +313,7 @@ def test_11_adk_agent_configuration_and_tool_binding() -> None:
         confidence=0.95,
         explanation="Standard service hardening directive",
     )
+    kp.add_mapping(known)
     from app.agents.teach_auditor import ADK_AVAILABLE
     if not ADK_AVAILABLE:
         pytest.skip("google-adk package is not installed in the local environment.")
