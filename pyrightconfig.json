@@ -1,0 +1,7 @@
+{
+  "venvPath": ".",
+  "venv": "Backend track 1/venv",
+  "extraPaths": [
+    "./Backend track 1"
+  ]
+}
