@@ -7,7 +7,6 @@ import { Features } from '../components/Features';
 import { ScanNotes } from '../components/ScanNotes';
 import { Footer } from '../components/Footer';
 import { PageTransition } from '../components/motion/PageTransition';
-import { Marquee } from '../components/motion/Marquee';
 import { InventoryScroll } from '../components/InventoryScroll';
 
 export function UploadPage() {

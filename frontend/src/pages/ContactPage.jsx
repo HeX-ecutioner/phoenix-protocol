@@ -5,23 +5,25 @@ import {
   ArrowLeft, 
   Send, 
   Mail, 
-  Phone, 
   MapPin, 
   ShieldAlert, 
   CheckCircle2, 
   Copy, 
   Terminal,
-  Cpu,
   Lock
 } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { PageTransition } from '../components/motion/PageTransition';
+import { submitContact } from '../services/api';
 
 export function ContactPage() {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [ticketId, setTicketId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,9 +42,34 @@ export function ContactPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const subject = formData.organization.trim()
+        ? `Mission Brief: ${formData.organization.trim()}`
+        : 'Compliance Mission Brief';
+      const message = formData.networkScale
+        ? `[Fleet Scale: ${formData.networkScale}]\n\n${formData.message.trim()}`
+        : formData.message.trim();
+
+      const response = await submitContact({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject,
+        message,
+      });
+
+      const returnedId = response.data?.ticket_id || response.ticket_id;
+      setTicketId(returnedId);
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err.message || 'Failed to transmit inquiry to server.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -124,6 +151,13 @@ export function ContactPage() {
                   <Terminal className="w-5 h-5 text-neutral-600" />
                 </div>
 
+                {submitError && (
+                  <div className="mb-6 p-4 bg-red-950/40 border border-red-800/80 text-red-400 font-mono text-xs flex items-center gap-3">
+                    <ShieldAlert className="w-5 h-5 shrink-0 text-red-400" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 <AnimatePresence mode="wait">
                   {submitted ? (
                     <motion.div 
@@ -138,11 +172,22 @@ export function ContactPage() {
                       <h3 className="text-2xl font-black uppercase tracking-tight text-white">
                         TRANSMISSION LOGGED // RECEIVED
                       </h3>
-                      <p className="font-mono text-xs text-neutral-400 max-w-md">
-                        Your inquiry has been assigned ticket <span className="text-brand-orange">#PX-{(Math.random() * 9000 + 1000).toFixed(0)}</span>. A Coastal Assasins security engineer will respond within 2 hours.
+                      <p className="font-mono text-xs text-neutral-400 max-w-md leading-relaxed">
+                        Your message has been received and assigned a tracking ID:{" "}
+                        <span className="text-brand-orange font-bold font-mono">#{ticketId}</span>.
                       </p>
                       <button 
-                        onClick={() => setSubmitted(false)}
+                        onClick={() => {
+                          setSubmitted(false);
+                          setTicketId('');
+                          setFormData({
+                            name: '',
+                            email: '',
+                            organization: '',
+                            networkScale: '50-500 Nodes',
+                            message: ''
+                          });
+                        }}
                         className="mt-4 px-6 py-2.5 bg-neutral-900 border border-neutral-800 hover:border-brand-orange text-xs font-mono font-bold uppercase tracking-widest text-neutral-300"
                       >
                         TRANSMIT ANOTHER BRIEF
@@ -227,10 +272,22 @@ export function ContactPage() {
 
                       <button 
                         type="submit"
-                        className="mt-2 w-full py-4 bg-brand-orange hover:bg-orange-500 text-white font-mono font-black text-xs uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_0_20px_rgba(234,88,20,0.3)]"
+                        disabled={isSubmitting}
+                        className={`mt-2 w-full py-4 bg-brand-orange hover:bg-orange-500 text-white font-mono font-black text-xs uppercase tracking-[0.25em] flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_0_20px_rgba(234,88,20,0.3)] ${
+                          isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+                        }`}
                       >
-                        <span>TRANSMIT INQUIRY TO SQUAD</span>
-                        <Send className="w-4 h-4" />
+                        {isSubmitting ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>TRANSMITTING TO DISPATCH...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>TRANSMIT INQUIRY TO SQUAD</span>
+                            <Send className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
                     </form>
                   )}
@@ -266,12 +323,12 @@ export function ContactPage() {
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="bg-black/40 border border-neutral-800/60 p-3 font-mono text-[11px]">
-                    <span className="text-neutral-500 block">INDIA HQ</span>
-                    <span className="text-neutral-200 font-bold mt-0.5 block">+91 98765 43210</span>
+                    <span className="text-neutral-500 block uppercase">PRIMARY LAB</span>
+                    <span className="text-neutral-200 font-bold mt-0.5 block">KOLKATA // ASIA</span>
                   </div>
                   <div className="bg-black/40 border border-neutral-800/60 p-3 font-mono text-[11px]">
-                    <span className="text-neutral-500 block">EUROPE DESK</span>
-                    <span className="text-neutral-200 font-bold mt-0.5 block">+44 20 7946 0958</span>
+                    <span className="text-neutral-500 block uppercase">NETWORK DESK</span>
+                    <span className="text-neutral-200 font-bold mt-0.5 block">LONDON // EMEA</span>
                   </div>
                 </div>
               </div>

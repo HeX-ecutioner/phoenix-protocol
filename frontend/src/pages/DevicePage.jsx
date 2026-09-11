@@ -236,7 +236,7 @@ export function DevicePage() {
                                     <div className="mt-6 flex items-start gap-3 pt-4 border-t border-neutral-700/50">
                                       <AlertTriangle size={16} className="text-warning flex-shrink-0 mt-0.5" />
                                       <p className="text-xs text-neutral-400 font-mono">
-                                        <strong>WARNING:</strong> Production changes require internal review and staged deployment. This is read-only guidance.
+                                        <strong>WARNING:</strong> Production changes require internal review and staged deployment. This is advisory remediation guidance.
                                       </p>
                                     </div>
                                   </div>
