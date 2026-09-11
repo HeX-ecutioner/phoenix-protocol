@@ -1,8 +1,10 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export function Navbar() {
+  const location = useLocation();
+  const isAbout = location.pathname === '/about';
+
   return (
     <nav className="w-full flex items-center justify-between px-6 py-4 bg-obsidian/80 backdrop-blur-md sticky top-0 z-50">
       {/* Left: Minimalist futuristic logo */}
@@ -20,25 +22,49 @@ export function Navbar() {
 
       {/* Center: Clean navigation links */}
       <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-8">
-        {[
-          { name: 'GLOBAL TOPOLOGY', href: '#global-topology' }
-        ].map((link) => (
-          <a key={link.name} href={link.href} className="text-neutral-400 hover:text-brand-orange transition-colors text-xs font-bold tracking-widest">
-            {link.name}
-          </a>
-        ))}
+        <Link 
+          to="/about" 
+          className={`transition-colors text-xs font-bold tracking-widest uppercase ${
+            isAbout ? 'text-brand-orange' : 'text-neutral-400 hover:text-brand-orange'
+          }`}
+        >
+          ABOUT SPEC
+        </Link>
+        <Link 
+          to="/#global-topology" 
+          className="text-neutral-400 hover:text-brand-orange transition-colors text-xs font-bold tracking-widest uppercase"
+        >
+          GLOBAL TOPOLOGY
+        </Link>
       </div>
 
-      {/* Right: Action button */}
+      {/* Right: Action button navigating to About Page */}
       <div className="flex items-center">
-        <button className="flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border border-neutral-800 hover:border-neutral-600 transition-colors group bg-black/40">
-          <span className="text-white text-xs font-bold tracking-[0.2em] uppercase">READ-ONLY MODE</span>
+        <Link 
+          to={isAbout ? "/" : "/about"} 
+          className={`flex items-center gap-4 pl-5 pr-1 py-1 rounded-full border transition-all duration-300 group ${
+            isAbout 
+              ? 'border-brand-orange/60 bg-brand-orange/10 shadow-[0_0_20px_rgba(234,88,20,0.2)]' 
+              : 'border-neutral-800 hover:border-neutral-600 bg-black/40 hover:bg-neutral-900/60'
+          }`}
+        >
+          <span className={`text-xs font-bold tracking-[0.2em] uppercase transition-colors ${
+            isAbout ? 'text-brand-orange' : 'text-white'
+          }`}>
+            {isAbout ? 'BACK TO SCANNER' : 'READ-ONLY MODE'}
+          </span>
           <div className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center group-hover:scale-105 transition-transform">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-4 h-4 ml-0.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+            {isAbout ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-4 h-4 ml-0.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            )}
           </div>
-        </button>
+        </Link>
       </div>
     </nav>
   );

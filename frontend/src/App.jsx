@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { UploadPage } from './pages/UploadPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DevicePage } from './pages/DevicePage';
+import { AboutPage } from './pages/AboutPage';
 import './styles/app.css';
 
 function AnimatedRoutes() {
@@ -13,6 +14,7 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<UploadPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/scans/:scanId" element={<DashboardPage />} />
         <Route path="/scans/:scanId/devices/:deviceId" element={<DevicePage />} />
       </Routes>
