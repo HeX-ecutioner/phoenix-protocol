@@ -1,0 +1,5 @@
+{
+  "detail": "No scan found with ID 'scan_does_not_exist_99999'.",
+  "error": "Scan not found",
+  "scan_id": "scan_does_not_exist_99999"
+}

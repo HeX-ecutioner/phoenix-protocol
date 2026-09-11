@@ -1,0 +1,17 @@
+{
+  "total_secrets_audited": 27,
+  "api_response_leaks": 0,
+  "database_leaks": 0,
+  "dangerous_primitives_found": 1,
+  "details": {
+    "api_leaks": [],
+    "db_leaks": [],
+    "dangerous_primitives": [
+      [
+        "backend\\app\\agents\\remediation.py",
+        6,
+        "paramiko SSH"
+      ]
+    ]
+  }
+}

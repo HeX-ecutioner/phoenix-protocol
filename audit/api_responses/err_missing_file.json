@@ -1,0 +1,4 @@
+{
+  "detail": "No files provided in upload request. Please provide at least one configuration file.",
+  "error": "Missing configuration files"
+}

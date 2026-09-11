@@ -1,0 +1,132 @@
+{
+  "compliance_score": 100.0,
+  "device_type": "cisco_ios",
+  "devices": [
+    {
+      "compliance_score": 100.0,
+      "device_id": "ee097d89-cdb8-45a7-a295-fb09eb20383b",
+      "device_type": "cisco_ios",
+      "display_name": "SECURE-CORE-RTR",
+      "error_message": null,
+      "line_count": 55,
+      "name": "SECURE-CORE-RTR",
+      "parse_status": "success",
+      "results": [
+        {
+          "evidence": "transport input ssh",
+          "evidence_line_range": "48",
+          "message": "Telnet is disabled on all administrative VTY line blocks (SSH-only enforced).",
+          "remediation": "line vty 0 4\n transport input ssh",
+          "rule_id": "NET-001",
+          "severity": "high",
+          "status": "pass"
+        },
+        {
+          "evidence": "ip ssh version 2",
+          "evidence_line_range": "26",
+          "message": "SSH version 2 is configured and active for remote management.",
+          "remediation": "ip ssh version 2",
+          "rule_id": "NET-002",
+          "severity": "high",
+          "status": "pass"
+        },
+        {
+          "evidence": "service password-encryption",
+          "evidence_line_range": "8",
+          "message": "Service password-encryption is active and all credentials use robust hashing.",
+          "remediation": "service password-encryption\nenable secret 9 <secret>",
+          "rule_id": "NET-003",
+          "severity": "high",
+          "status": "pass"
+        },
+        {
+          "evidence": "login block-for 300 attempts 3 within 60",
+          "evidence_line_range": "30",
+          "message": "Login failure protection is configured (block-for 300s on 3 attempts within 60s).",
+          "remediation": "login block-for 300 attempts 3 within 60",
+          "rule_id": "NET-004",
+          "severity": "medium",
+          "status": "pass"
+        },
+        {
+          "evidence": "logging host 198.51.100.50",
+          "evidence_line_range": "33",
+          "message": "Remote system logging is configured to syslog host(s): 198.51.100.50.",
+          "remediation": "service timestamps log datetime msec\nlogging host <syslog-ip>",
+          "rule_id": "NET-005",
+          "severity": "medium",
+          "status": "pass"
+        },
+        {
+          "evidence": "ntp server 198.51.100.123 prefer",
+          "evidence_line_range": "35",
+          "message": "Authoritative NTP server(s) configured: 198.51.100.123.",
+          "remediation": "ntp server <trusted-ntp-ip>",
+          "rule_id": "NET-006",
+          "severity": "medium",
+          "status": "pass"
+        },
+        {
+          "evidence": "access-class SECURE_MGMT_ACL in",
+          "evidence_line_range": "46",
+          "message": "Administrative access-class configured across all VTY line blocks: line vty 0 4 (ACL: SECURE_MGMT_ACL), line vty 5 15 (ACL: SECURE_MGMT_ACL).",
+          "remediation": "line vty 0 4\n access-class <acl_number_or_name> in",
+          "rule_id": "NET-007",
+          "severity": "high",
+          "status": "pass"
+        },
+        {
+          "evidence": "no ip http server",
+          "evidence_line_range": "10",
+          "message": "Insecure services (HTTP server, small TCP/UDP servers, source routing) are explicitly disabled.",
+          "remediation": "no ip http server\nno service tcp-small-servers\nno service udp-small-servers",
+          "rule_id": "NET-008",
+          "severity": "low",
+          "status": "pass"
+        },
+        {
+          "evidence": "banner motd ^ ... ^",
+          "evidence_line_range": "16-20",
+          "message": "Device identification (hostname 'SECURE-CORE-RTR') and security warning banner are properly configured.",
+          "remediation": "banner motd ^C Authorized Access Only ^C",
+          "rule_id": "NET-009",
+          "severity": "low",
+          "status": "pass"
+        },
+        {
+          "evidence": "No plaintext credentials detected in configuration",
+          "evidence_line_range": null,
+          "message": "No obvious plaintext credentials identified in configuration.",
+          "remediation": "Replace unencrypted credentials with hashed secrets or encrypted keys.",
+          "rule_id": "NET-010",
+          "severity": "high",
+          "status": "pass"
+        }
+      ],
+      "source_filename": "all_security_controls.txt",
+      "summary": {
+        "error_rules": 0,
+        "failed_rules": 0,
+        "not_applicable_rules": 0,
+        "passed_rules": 10,
+        "tested_rule_compliance": 100.0,
+        "total_rules": 10,
+        "warning_rules": 0
+      },
+      "vendor": "Cisco"
+    }
+  ],
+  "parser_version": "1.0.0",
+  "rule_set_version": "1.0.0",
+  "scan_id": "scan_259ec22cc41b43cda1be6642c42a4a08",
+  "status": "completed",
+  "summary": {
+    "error_rules": 0,
+    "failed_rules": 0,
+    "not_applicable_rules": 0,
+    "passed_rules": 10,
+    "tested_rule_compliance": 100.0,
+    "total_rules": 10,
+    "warning_rules": 0
+  }
+}

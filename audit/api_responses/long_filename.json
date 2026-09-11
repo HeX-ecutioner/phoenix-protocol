@@ -1,0 +1,132 @@
+{
+  "compliance_score": 28.57,
+  "device_type": "cisco_ios",
+  "devices": [
+    {
+      "compliance_score": 28.57,
+      "device_id": "c22ad536-8154-4645-b36a-16fa6581167f",
+      "device_type": "cisco_ios",
+      "display_name": "router2",
+      "error_message": null,
+      "line_count": 2,
+      "name": "router2",
+      "parse_status": "success",
+      "results": [
+        {
+          "evidence": "No line vty configuration blocks found",
+          "evidence_line_range": null,
+          "message": "Unable to verify Telnet status: no VTY line blocks found in configuration.",
+          "remediation": "line vty 0 4\n transport input ssh",
+          "rule_id": "NET-001",
+          "severity": "high",
+          "status": "warning"
+        },
+        {
+          "evidence": "No 'ip ssh' configuration statement detected",
+          "evidence_line_range": null,
+          "message": "SSH is not enabled for secure administrative access.",
+          "remediation": "ip ssh version 2",
+          "rule_id": "NET-002",
+          "severity": "high",
+          "status": "fail"
+        },
+        {
+          "evidence": "service password-encryption",
+          "evidence_line_range": "2",
+          "message": "Service password-encryption is active and all credentials use robust hashing.",
+          "remediation": "service password-encryption\nenable secret 9 <secret>",
+          "rule_id": "NET-003",
+          "severity": "high",
+          "status": "pass"
+        },
+        {
+          "evidence": "No 'login block-for' configuration statement detected",
+          "evidence_line_range": null,
+          "message": "Login failure protection (login block-for) is not configured against brute-force attacks.",
+          "remediation": "login block-for 300 attempts 3 within 60",
+          "rule_id": "NET-004",
+          "severity": "medium",
+          "status": "fail"
+        },
+        {
+          "evidence": "No logging host or logging timestamps configuration detected",
+          "evidence_line_range": null,
+          "message": "System logging is not configured.",
+          "remediation": "service timestamps log datetime msec\nlogging host <syslog-ip>",
+          "rule_id": "NET-005",
+          "severity": "medium",
+          "status": "fail"
+        },
+        {
+          "evidence": "No 'ntp server' or 'ntp peer' configuration statements detected",
+          "evidence_line_range": null,
+          "message": "No trusted time source (NTP) configured.",
+          "remediation": "ntp server <trusted-ntp-ip>",
+          "rule_id": "NET-006",
+          "severity": "medium",
+          "status": "fail"
+        },
+        {
+          "evidence": "No VTY lines found to verify access-class restrictions",
+          "evidence_line_range": null,
+          "message": "Unable to verify administrative access list: no line vty blocks found in configuration.",
+          "remediation": "line vty 0 4\n access-class <acl_number_or_name> in",
+          "rule_id": "NET-007",
+          "severity": "high",
+          "status": "warning"
+        },
+        {
+          "evidence": "No explicit service disabling statements found",
+          "evidence_line_range": null,
+          "message": "Insecure services are neither explicitly enabled nor explicitly disabled in configuration.",
+          "remediation": "no ip http server\nno service tcp-small-servers\nno service udp-small-servers",
+          "rule_id": "NET-008",
+          "severity": "low",
+          "status": "warning"
+        },
+        {
+          "evidence": "hostname router2",
+          "evidence_line_range": "1",
+          "message": "Device identification configured (hostname 'router2'), but legal security warning banner (banner motd/login) is missing.",
+          "remediation": "banner motd ^C Authorized Access Only ^C",
+          "rule_id": "NET-009",
+          "severity": "low",
+          "status": "fail"
+        },
+        {
+          "evidence": "No plaintext credentials detected in configuration",
+          "evidence_line_range": null,
+          "message": "No obvious plaintext credentials identified in configuration.",
+          "remediation": "Replace unencrypted credentials with hashed secrets or encrypted keys.",
+          "rule_id": "NET-010",
+          "severity": "high",
+          "status": "pass"
+        }
+      ],
+      "source_filename": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt",
+      "summary": {
+        "error_rules": 0,
+        "failed_rules": 5,
+        "not_applicable_rules": 0,
+        "passed_rules": 2,
+        "tested_rule_compliance": 28.57,
+        "total_rules": 10,
+        "warning_rules": 3
+      },
+      "vendor": "Cisco"
+    }
+  ],
+  "parser_version": "1.0.0",
+  "rule_set_version": "1.0.0",
+  "scan_id": "scan_f712c13c82084e8dbfb469e66ce36a65",
+  "status": "completed",
+  "summary": {
+    "error_rules": 0,
+    "failed_rules": 5,
+    "not_applicable_rules": 0,
+    "passed_rules": 2,
+    "tested_rule_compliance": 28.57,
+    "total_rules": 10,
+    "warning_rules": 3
+  }
+}

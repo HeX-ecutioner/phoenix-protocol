@@ -1,0 +1,530 @@
+{
+  "health": {
+    "status": 200,
+    "body": {
+      "service": "phoenix-protocol",
+      "status": "healthy",
+      "version": "1.0.0"
+    }
+  },
+  "compliant.json": {
+    "label": "compliant_router.txt",
+    "status_code": 201,
+    "scan_id": "scan_879e83acb0e8425c9810b492d4571d64",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 10,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "failing.json": {
+    "label": "failing_router.txt",
+    "status_code": 201,
+    "scan_id": "scan_7e30340a0871401392714c46542823b7",
+    "compliance_score": 0.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 10,
+      "not_applicable_rules": 0,
+      "passed_rules": 0,
+      "tested_rule_compliance": 0.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "ambiguous.json": {
+    "label": "ambiguous_router.txt",
+    "status_code": 201,
+    "scan_id": "scan_d42f4d19710742abb63d9783b37d2d25",
+    "compliance_score": 16.67,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 5,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 16.67,
+      "total_rules": 10,
+      "warning_rules": 4
+    },
+    "device_count": 1
+  },
+  "garbage.json": {
+    "label": "garbage.txt",
+    "status_code": 201,
+    "scan_id": "scan_add52ac7c58c40bf83e7a6acb59c00c8",
+    "compliance_score": 16.67,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 5,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 16.67,
+      "total_rules": 10,
+      "warning_rules": 4
+    },
+    "device_count": 1
+  },
+  "malformed_banner.json": {
+    "label": "malformed_banner.txt",
+    "status_code": 201,
+    "scan_id": "scan_ae7b0bc524024883a12805e1d16a36c2",
+    "compliance_score": 14.29,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 6,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 14.29,
+      "total_rules": 10,
+      "warning_rules": 3
+    },
+    "device_count": 1
+  },
+  "empty.json": {
+    "label": "empty.txt",
+    "status_code": 400,
+    "scan_id": null,
+    "compliance_score": null,
+    "summary": null,
+    "device_count": 0
+  },
+  "multiple_vty_blocks.json": {
+    "label": "multiple_vty_blocks.txt",
+    "status_code": 201,
+    "scan_id": "scan_703cdc6d5bbb4811a04ab32f8ff7228b",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 10,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "partial_vty_failure.json": {
+    "label": "partial_vty_failure.txt",
+    "status_code": 201,
+    "scan_id": "scan_e9da59401cbb420dac9f03fdd98992fb",
+    "compliance_score": 80.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 2,
+      "not_applicable_rules": 0,
+      "passed_rules": 8,
+      "tested_rule_compliance": 80.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "ambiguous_transport.json": {
+    "label": "ambiguous_transport.txt",
+    "status_code": 201,
+    "scan_id": "scan_f1ee405c60db4f62b9ed58dfef6dff5a",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "local_logging_only.json": {
+    "label": "local_logging_only.txt",
+    "status_code": 201,
+    "scan_id": "scan_15e14565fb5146808cc929d7218e64b2",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "no_banner.json": {
+    "label": "no_banner.txt",
+    "status_code": 201,
+    "scan_id": "scan_10d90e2dfbb14721b51af8ffd164f2fc",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "ntp_peer_only.json": {
+    "label": "ntp_peer_only.txt",
+    "status_code": 201,
+    "scan_id": "scan_1b3256a5cce742edb3125190550b854e",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "partial_config.json": {
+    "label": "partial_config.txt",
+    "status_code": 201,
+    "scan_id": "scan_a1d492365f154979aabb702d24dce3f2",
+    "compliance_score": 14.29,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 6,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 14.29,
+      "total_rules": 10,
+      "warning_rules": 3
+    },
+    "device_count": 1
+  },
+  "plaintext_credentials.json": {
+    "label": "plaintext_credentials.txt",
+    "status_code": 201,
+    "scan_id": "scan_4d7701ed46dc44b69c3a5428625426d2",
+    "compliance_score": 11.11,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 8,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 11.11,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "type7_credentials.json": {
+    "label": "type7_credentials.txt",
+    "status_code": 201,
+    "scan_id": "scan_8c9ccb5441834580a02fe3295838477b",
+    "compliance_score": 22.22,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 7,
+      "not_applicable_rules": 0,
+      "passed_rules": 2,
+      "tested_rule_compliance": 22.22,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "tacacs_radius_secrets.json": {
+    "label": "tacacs_radius_secrets.txt",
+    "status_code": 201,
+    "scan_id": "scan_9ebfc02b0ab145f1aa74fe2e1d50a150",
+    "compliance_score": 22.22,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 7,
+      "not_applicable_rules": 0,
+      "passed_rules": 2,
+      "tested_rule_compliance": 22.22,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "mixed_secrets.json": {
+    "label": "mixed_secrets.txt",
+    "status_code": 201,
+    "scan_id": "scan_115078234dff45b7808703ee9e53e3fc",
+    "compliance_score": 11.11,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 8,
+      "not_applicable_rules": 0,
+      "passed_rules": 1,
+      "tested_rule_compliance": 11.11,
+      "total_rules": 10,
+      "warning_rules": 1
+    },
+    "device_count": 1
+  },
+  "insecure_services_enabled.json": {
+    "label": "insecure_services_enabled.txt",
+    "status_code": 201,
+    "scan_id": "scan_fce2aa60e5d043a38002fffbf54994d7",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "insecure_services_disabled.json": {
+    "label": "insecure_services_disabled.txt",
+    "status_code": 201,
+    "scan_id": "scan_238f879e0a9a4d3399f80496b6735cdf",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 10,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "remediation_demo.json": {
+    "label": "remediation_demo.txt",
+    "status_code": 201,
+    "scan_id": "scan_77cd82a6c62f4be781f0467a8573d984",
+    "compliance_score": 0.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 10,
+      "not_applicable_rules": 0,
+      "passed_rules": 0,
+      "tested_rule_compliance": 0.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "multi_device_secondary.json": {
+    "label": "multi_device_secondary.txt",
+    "status_code": 201,
+    "scan_id": "scan_b59c5ea42c3e47ec909935b3b86292e5",
+    "compliance_score": 70.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 3,
+      "not_applicable_rules": 0,
+      "passed_rules": 7,
+      "tested_rule_compliance": 70.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net001_telnet.json": {
+    "label": "net001_telnet.txt",
+    "status_code": 201,
+    "scan_id": "scan_5b0d561de156433a8f8ebc808ae389a3",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net002_no_ssh.json": {
+    "label": "net002_no_ssh.txt",
+    "status_code": 201,
+    "scan_id": "scan_3c77fbe97f57436282937e00d2e2717d",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net003_weak_credentials.json": {
+    "label": "net003_weak_credentials.txt",
+    "status_code": 201,
+    "scan_id": "scan_a032992052b74a5e9c7766a7e6a9fcd7",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net004_no_login_protection.json": {
+    "label": "net004_no_login_protection.txt",
+    "status_code": 201,
+    "scan_id": "scan_00e9b6cf70d741c99ca4ee513eb3c2d5",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net005_no_logging.json": {
+    "label": "net005_no_logging.txt",
+    "status_code": 201,
+    "scan_id": "scan_685cc70d5ee1479f83bab47694d4336b",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net006_no_ntp.json": {
+    "label": "net006_no_ntp.txt",
+    "status_code": 201,
+    "scan_id": "scan_142d31eeca304d8da23f400358bd48cb",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net007_no_access_class.json": {
+    "label": "net007_no_access_class.txt",
+    "status_code": 201,
+    "scan_id": "scan_82da1eb3b4464a8d897e5583c7baf80b",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net008_insecure_services.json": {
+    "label": "net008_insecure_services.txt",
+    "status_code": 201,
+    "scan_id": "scan_c7b0be320bea4ef886d5b19247b5f301",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net009_no_banner.json": {
+    "label": "net009_no_banner.txt",
+    "status_code": 201,
+    "scan_id": "scan_b6b231e1fffc4cf8841976bf2be26435",
+    "compliance_score": 90.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 1,
+      "not_applicable_rules": 0,
+      "passed_rules": 9,
+      "tested_rule_compliance": 90.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "net010_plaintext_secret.json": {
+    "label": "net010_plaintext_secret.txt",
+    "status_code": 201,
+    "scan_id": "scan_417e211562ab49ccb9e984cd5e824d87",
+    "compliance_score": 80.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 2,
+      "not_applicable_rules": 0,
+      "passed_rules": 8,
+      "tested_rule_compliance": 80.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "all_security_controls.json": {
+    "label": "all_security_controls.txt",
+    "status_code": 201,
+    "scan_id": "scan_259ec22cc41b43cda1be6642c42a4a08",
+    "compliance_score": 100.0,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 0,
+      "not_applicable_rules": 0,
+      "passed_rules": 10,
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "warning_rules": 0
+    },
+    "device_count": 1
+  },
+  "multi_device.json": {
+    "label": "multi-file batch (3 devices)",
+    "status_code": 201,
+    "scan_id": "scan_2a6e225a00a6443b8cc8154cadc933cb",
+    "compliance_score": 56.67,
+    "summary": {
+      "error_rules": 0,
+      "failed_rules": 13,
+      "not_applicable_rules": 0,
+      "passed_rules": 17,
+      "tested_rule_compliance": 56.67,
+      "total_rules": 30,
+      "warning_rules": 0
+    },
+    "device_count": 3
+  }
+}

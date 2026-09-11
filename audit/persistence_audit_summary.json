@@ -1,0 +1,111 @@
+{
+  "foreign_keys_pragma": 0,
+  "table_counts": {
+    "scans": 47,
+    "devices": 52,
+    "rules": 10,
+    "rule_results": 520
+  },
+  "columns": {
+    "scans": [
+      "id",
+      "device_type",
+      "status",
+      "parser_version",
+      "rule_set_version",
+      "total_rules",
+      "passed_rules",
+      "failed_rules",
+      "warning_rules",
+      "not_applicable_rules",
+      "error_rules",
+      "tested_rule_compliance",
+      "created_at",
+      "updated_at",
+      "completed_at"
+    ],
+    "devices": [
+      "id",
+      "scan_id",
+      "name",
+      "display_name",
+      "vendor",
+      "device_type",
+      "source_filename",
+      "parse_status",
+      "line_count",
+      "error_message",
+      "total_rules",
+      "passed_rules",
+      "failed_rules",
+      "warning_rules",
+      "not_applicable_rules",
+      "error_rules",
+      "tested_rule_compliance",
+      "created_at"
+    ],
+    "rule_results": [
+      "id",
+      "scan_id",
+      "device_id",
+      "rule_id",
+      "status",
+      "severity",
+      "evidence",
+      "evidence_line_range",
+      "message",
+      "remediation",
+      "evaluation_timestamp",
+      "engine_version",
+      "error_message"
+    ]
+  },
+  "has_raw_config_column": false,
+  "sample_scans": [
+    {
+      "id": "scan_a564b017bf4c4ad282205761f05aa272",
+      "status": "completed",
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "passed_rules": 10,
+      "failed_rules": 0,
+      "warning_rules": 0
+    },
+    {
+      "id": "scan_879e83acb0e8425c9810b492d4571d64",
+      "status": "completed",
+      "tested_rule_compliance": 100.0,
+      "total_rules": 10,
+      "passed_rules": 10,
+      "failed_rules": 0,
+      "warning_rules": 0
+    },
+    {
+      "id": "scan_7e30340a0871401392714c46542823b7",
+      "status": "completed",
+      "tested_rule_compliance": 0.0,
+      "total_rules": 10,
+      "passed_rules": 0,
+      "failed_rules": 10,
+      "warning_rules": 0
+    },
+    {
+      "id": "scan_d42f4d19710742abb63d9783b37d2d25",
+      "status": "completed",
+      "tested_rule_compliance": 16.67,
+      "total_rules": 10,
+      "passed_rules": 1,
+      "failed_rules": 5,
+      "warning_rules": 4
+    },
+    {
+      "id": "scan_add52ac7c58c40bf83e7a6acb59c00c8",
+      "status": "completed",
+      "tested_rule_compliance": 16.67,
+      "total_rules": 10,
+      "passed_rules": 1,
+      "failed_rules": 5,
+      "warning_rules": 4
+    }
+  ]
+}

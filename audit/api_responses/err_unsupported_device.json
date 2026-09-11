@@ -1,0 +1,4 @@
+{
+  "detail": "Device type 'juniper_junos' is not supported. Supported: ['cisco', 'cisco-like', 'cisco_ios', 'cisco_like', 'cisco_nxos', 'cisco_xe', 'cisco_xr'].",
+  "error": "Unsupported device type"
+}
