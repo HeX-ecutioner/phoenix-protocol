@@ -13,7 +13,8 @@ import { InventoryScroll } from '../components/InventoryScroll';
 
 export function UploadPage() {
   const location = useLocation();
-  const [showLoader, setShowLoader] = React.useState(Boolean(location.state?.showLoader));
+  // Always start with the loading animation on page refresh or initial mount
+  const [showLoader, setShowLoader] = React.useState(true);
   const [isHeroLoaded, setIsHeroLoaded] = React.useState(false);
   const [heroKey, setHeroKey] = React.useState(1);
 

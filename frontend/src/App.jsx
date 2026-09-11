@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { UploadPage } from './pages/UploadPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -26,6 +26,25 @@ function AnimatedRoutes() {
   );
 }
 
+function RefreshRedirect() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    try {
+      const navEntries = performance.getEntriesByType('navigation');
+      const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
+      if (isReload && location.pathname !== '/') {
+        navigate('/', { replace: true, state: { showLoader: true } });
+      }
+    } catch {
+      // Ignore if performance API is not available
+    }
+  }, []);
+
+  return null;
+}
+
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
@@ -41,6 +60,7 @@ function ScrollToTop() {
 function App() {
   return (
     <BrowserRouter>
+      <RefreshRedirect />
       <ScrollToTop />
       <AnimatedRoutes />
     </BrowserRouter>
