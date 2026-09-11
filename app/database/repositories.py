@@ -598,3 +598,16 @@ def get_device_summary(conn: sqlite3.Connection, device_id: str) -> ComplianceSu
 
 def get_scan_summary(conn: sqlite3.Connection, scan_id: str) -> ComplianceSummary:
     return RuleResultRepository(conn).get_scan_summary(scan_id)
+
+
+def ensure_rules_seeded(
+    conn: sqlite3.Connection, rules: Optional[List[Rule]] = None
+) -> None:
+    """Ensure baseline compliance rules are seeded in the database without duplicate entries."""
+    from app.rules.definitions import INITIAL_RULES
+
+    target_rules = rules if rules is not None else INITIAL_RULES
+    repo = RuleRepository(conn)
+    for rule in target_rules:
+        repo.upsert(rule)
+

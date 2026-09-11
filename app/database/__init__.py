@@ -19,6 +19,7 @@ from app.database.repositories import (
     list_devices_for_scan,
     list_rule_results_for_device,
     list_rules,
+    ensure_rules_seeded,
 )
 from app.database.schema import init_db
 
