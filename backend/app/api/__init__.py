@@ -1,5 +1,4 @@
-"""Flask API package for Phoenix Protocol."""
-
+import os
 from typing import Any, Dict, Optional
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -22,6 +21,16 @@ def create_app(
 
     if test_config:
         app.config.update(test_config)
+
+    if "KNOWLEDGE_DB_PATH" not in app.config:
+        if app.config.get("TESTING"):
+            app.config["KNOWLEDGE_DB_PATH"] = ":memory:"
+        elif db_path and db_path != "phoenix_protocol.db":
+            app.config["KNOWLEDGE_DB_PATH"] = db_path.replace(".db", "_knowledge.db")
+        else:
+            app.config["KNOWLEDGE_DB_PATH"] = os.environ.get(
+                "KNOWLEDGE_DB_PATH", "phoenix_knowledge.db"
+            )
 
     # Initialize schema on startup
     target_db = app.config.get("DATABASE_PATH")

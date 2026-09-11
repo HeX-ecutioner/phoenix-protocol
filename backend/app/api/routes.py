@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import io
 import os
 import re
+import secrets
 from typing import Any, Dict, List, Optional, Tuple
 import uuid
 from flask import Blueprint, Response, current_app, jsonify, make_response, request
@@ -16,6 +17,7 @@ from werkzeug.utils import secure_filename
 
 from app.database.connection import get_connection
 from app.database.repositories import (
+    ContactSubmissionRepository,
     DeviceRepository,
     RuleRepository,
     RuleResultRepository,
@@ -31,6 +33,11 @@ from app.services.scanner import (
     SUPPORTED_DEVICE_TYPES,
     run_scan,
 )
+from app.agents.explanation import FindingExplainer
+from app.agents.knowledge import Dev2KnowledgeProvider
+from app.agents.remediation import RemediationService
+from app.agents.schemas import UnknownCommand
+from app.agents.teach_auditor import TeachAuditorService
 
 api_bp = Blueprint("api", __name__)
 
@@ -196,6 +203,31 @@ def _format_rule_result(r: Any) -> Dict[str, Any]:
     rule_meta = RULES_BY_ID.get(rule_id)
     title = rule_meta.title if rule_meta else (rule_id or "Compliance Rule")
 
+    ai_explanation = None
+    ai_remediation = None
+    if status in ("fail", "warning"):
+        try:
+            ai_explanation = FindingExplainer().explain(
+                rule_id=rule_id,
+                severity=severity,
+                evidence=evidence,
+                vendor="Cisco",
+                platform="cisco_ios",
+            ).to_dict()
+        except Exception:
+            ai_explanation = None
+
+        try:
+            ai_remediation = RemediationService().generate_remediation(
+                rule_id=rule_id,
+                vendor="Cisco",
+                platform="cisco_ios",
+                evidence=evidence,
+                severity=severity,
+            ).to_dict()
+        except Exception:
+            ai_remediation = None
+
     return {
         "rule_id": rule_id,
         "title": title,
@@ -207,6 +239,8 @@ def _format_rule_result(r: Any) -> Dict[str, Any]:
         "evidence_end_line": end_line,
         "message": message,
         "remediation": remediation,
+        "ai_explanation": ai_explanation,
+        "ai_remediation": ai_remediation,
         "evaluation_timestamp": timestamp,
         "evaluated_at": timestamp,
         "rule_version": rule_meta.rule_version if rule_meta else (engine_ver or "1.0.0"),
@@ -838,6 +872,146 @@ def api_get_scan_report_csv(scan_id: str):
 
 
 # ============================================================================
+# Contact Inquiries Endpoint
+# ============================================================================
+
+EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+DISALLOWED_PHONE_KEYS = {"phone", "phone_number", "telephone", "tel", "mobile", "contact_number"}
+
+
+@api_bp.route("/api/contact", methods=["POST"])
+def submit_contact():
+    """Submit a contact inquiry and return an authoritative ticket ID.
+
+    Validates input server-side, persists to SQLite database, rejects
+    phone fields, and enforces length and format constraints.
+    """
+    req_id = _generate_request_id()
+
+    # Reject non-JSON or missing payload
+    if not request.is_json:
+        return api_error(
+            code="INVALID_PAYLOAD",
+            message="Request body must be valid JSON.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    try:
+        data = request.get_json(silent=True)
+    except Exception:
+        data = None
+
+    if not isinstance(data, dict):
+        return api_error(
+            code="INVALID_PAYLOAD",
+            message="Request body must be a JSON object.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    # Reject payloads containing phone fields
+    for key in data.keys():
+        if key.lower() in DISALLOWED_PHONE_KEYS:
+            return api_error(
+                code="DISALLOWED_FIELD",
+                message="Phone numbers are not collected or permitted.",
+                status_code=400,
+                request_id=req_id,
+            )
+
+    name = data.get("name")
+    email = data.get("email")
+    subject = data.get("subject")
+    message = data.get("message")
+
+    # Validate required fields exist and are strings
+    for field_name, val in [("name", name), ("email", email), ("subject", subject), ("message", message)]:
+        if val is None or not isinstance(val, str) or not val.strip():
+            return api_error(
+                code="VALIDATION_ERROR",
+                message=f"Field '{field_name}' is required and cannot be empty.",
+                status_code=400,
+                request_id=req_id,
+            )
+
+    name = name.strip()
+    email = email.strip()
+    subject = subject.strip()
+    message = message.strip()
+
+    # Length validations
+    if len(name) > 100:
+        return api_error(
+            code="VALIDATION_ERROR",
+            message="Name cannot exceed 100 characters.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    if len(email) > 254:
+        return api_error(
+            code="VALIDATION_ERROR",
+            message="Email cannot exceed 254 characters.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    if not EMAIL_REGEX.match(email):
+        return api_error(
+            code="VALIDATION_ERROR",
+            message="Invalid email address format.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    if len(subject) > 200:
+        return api_error(
+            code="VALIDATION_ERROR",
+            message="Subject cannot exceed 200 characters.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    if len(message) > 5000:
+        return api_error(
+            code="VALIDATION_ERROR",
+            message="Message cannot exceed 5000 characters.",
+            status_code=400,
+            request_id=req_id,
+        )
+
+    # Server-side deterministic, unique ticket ID generation: PX-YYYYMMDD-XXXXXX
+    date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
+    hex_token = secrets.token_hex(3).upper()
+    ticket_id = f"PX-{date_str}-{hex_token}"
+
+    db_path = current_app.config.get("DATABASE_PATH")
+    conn = get_connection(db_path)
+    try:
+        repo = ContactSubmissionRepository(conn)
+        repo.create(
+            ticket_id=ticket_id,
+            name=name,
+            email=email,
+            subject=subject,
+            message=message,
+            status="received",
+        )
+    finally:
+        conn.close()
+
+    return api_envelope(
+        data={
+            "ticket_id": ticket_id,
+            "status": "received",
+        },
+        status_code=201,
+        request_id=req_id,
+    )
+
+
+# ============================================================================
 # Legacy Compatibility Endpoints (/health, /scan, /scans/<scan_id>)
 # ============================================================================
 
@@ -992,3 +1166,237 @@ def get_scan(scan_id: str):
         )
 
     return jsonify(scan_dict), 200
+
+
+# ============================================================================
+# Knowledge Layer & Teach the Auditor (Google ADK Integration)
+# ============================================================================
+
+
+def get_knowledge_provider() -> Dev2KnowledgeProvider:
+    """Retrieve or initialize the Dev2KnowledgeProvider singleton on current_app."""
+    if not hasattr(current_app, "extensions"):
+        current_app.extensions = {}
+    provider = current_app.extensions.get("knowledge_provider")
+    if provider is None:
+        db_path = current_app.config.get("KNOWLEDGE_DB_PATH") or os.environ.get(
+            "KNOWLEDGE_DB_PATH", "phoenix_knowledge.db"
+        )
+        provider = Dev2KnowledgeProvider(db_path=db_path)
+        current_app.extensions["knowledge_provider"] = provider
+    return provider
+
+
+def get_teach_auditor_service() -> TeachAuditorService:
+    """Retrieve or initialize the TeachAuditorService singleton on current_app."""
+    if not hasattr(current_app, "extensions"):
+        current_app.extensions = {}
+    teach_service = current_app.extensions.get("teach_auditor_service")
+    if teach_service is None:
+        provider = get_knowledge_provider()
+        teach_service = TeachAuditorService(knowledge_provider=provider)
+        current_app.extensions["teach_auditor_service"] = teach_service
+    return teach_service
+
+
+@api_bp.route("/api/knowledge/propose", methods=["POST"])
+def api_knowledge_propose():
+    """Submit an unfamiliar command to Teach the Auditor for AI interpretation.
+
+    Workflow:
+      1. Checks knowledge base first (via Dev2KnowledgeProvider).
+      2. If already approved, returns existing mapping with requires_human_approval=False.
+      3. If unfamiliar, interprets command via ADK Agent / heuristic engine.
+      4. Stores proposal in SQLite with status='proposed'.
+      5. Explicitly flags requires_human_approval=True.
+    """
+    payload = request.get_json(silent=True) or {}
+    command = payload.get("command") or payload.get("command_pattern")
+    if not command or not str(command).strip():
+        return api_error("INVALID_PAYLOAD", "Command is required.", 400)
+
+    vendor = str(payload.get("vendor") or "Cisco").strip()
+    platform = str(payload.get("platform") or "IOS").strip()
+    context = payload.get("context")
+
+    teach_service = get_teach_auditor_service()
+    provider = get_knowledge_provider()
+
+    unknown = UnknownCommand(
+        vendor=vendor,
+        platform=platform,
+        command=str(command).strip(),
+        context=context if isinstance(context, list) else ([str(context)] if context else None),
+    )
+
+    proposal = teach_service.interpret_command(unknown)
+    mapping_id = None
+
+    if proposal.source == "ai_agent":
+        try:
+            record = provider.propose_mapping(proposal.interpretation, source="ai_agent")
+            mapping_id = record.id
+        except Exception:
+            pass
+    else:
+        existing = provider.service.lookup_command(vendor=vendor, platform=platform, command=command)
+        if existing:
+            mapping_id = existing.id
+
+    has_live_gemini = bool(os.environ.get("GEMINI_API_KEY"))
+
+    data = {
+        "mapping_id": mapping_id,
+        "command": proposal.interpretation.command,
+        "vendor": proposal.interpretation.vendor,
+        "platform": proposal.interpretation.platform,
+        "meaning": proposal.interpretation.meaning,
+        "security_control": proposal.interpretation.security_control,
+        "mapped_rule_id": proposal.interpretation.mapped_rule_id,
+        "confidence": proposal.interpretation.confidence,
+        "explanation": proposal.interpretation.explanation,
+        "requires_human_approval": proposal.requires_human_approval,
+        "source": proposal.source,
+        "status": "proposed" if proposal.requires_human_approval else "approved",
+        "adk_mode": "gemini_adk_runner" if has_live_gemini else "adk_deterministic_engine",
+        "engine_info": (
+            "Google ADK Agent with Gemini model"
+            if has_live_gemini
+            else "ADK Offline Deterministic Heuristic Engine (GEMINI_API_KEY not configured)"
+        ),
+    }
+    return api_envelope(data, 200)
+
+
+@api_bp.route("/api/knowledge/approve", methods=["POST"])
+def api_knowledge_approve():
+    """Human auditor approves a proposed knowledge mapping.
+
+    Transitions status from 'proposed' to 'approved'.
+    Once approved, future audits and lookups hit the knowledge base directly.
+    """
+    payload = request.get_json(silent=True) or {}
+    mapping_id = payload.get("mapping_id")
+    if not mapping_id or not str(mapping_id).strip():
+        return api_error("INVALID_PAYLOAD", "Field 'mapping_id' is required.", 400)
+
+    provider = get_knowledge_provider()
+    try:
+        updated = provider.approve_mapping(str(mapping_id).strip())
+    except ValueError as e:
+        return api_error("NOT_FOUND", str(e), 404)
+    except Exception as e:
+        return api_error("APPROVAL_FAILED", str(e), 400)
+
+    return api_envelope(
+        {
+            "mapping": updated.to_dict(),
+            "status": "approved",
+            "message": "Mapping approved successfully. Future audits will recognize this command without AI invocation.",
+        },
+        200,
+    )
+
+
+@api_bp.route("/api/knowledge/reject", methods=["POST"])
+def api_knowledge_reject():
+    """Human auditor rejects a proposed knowledge mapping.
+
+    Transitions status to 'rejected'. Retained in database for audit trail.
+    """
+    payload = request.get_json(silent=True) or {}
+    mapping_id = payload.get("mapping_id")
+    if not mapping_id or not str(mapping_id).strip():
+        return api_error("INVALID_PAYLOAD", "Field 'mapping_id' is required.", 400)
+    reason = payload.get("reason")
+
+    provider = get_knowledge_provider()
+    try:
+        updated = provider.reject_mapping(str(mapping_id).strip(), reason=reason)
+    except ValueError as e:
+        return api_error("NOT_FOUND", str(e), 404)
+    except Exception as e:
+        return api_error("REJECTION_FAILED", str(e), 400)
+
+    return api_envelope(
+        {
+            "mapping": updated.to_dict(),
+            "status": "rejected",
+            "message": "Mapping rejected and retained for historical audit trail.",
+        },
+        200,
+    )
+
+
+@api_bp.route("/api/knowledge/lookup", methods=["GET"])
+def api_knowledge_lookup():
+    """Look up whether a command is known in the approved knowledge base."""
+    command = request.args.get("command")
+    if not command or not command.strip():
+        return api_error("INVALID_QUERY", "Query parameter 'command' is required.", 400)
+
+    vendor = request.args.get("vendor", "Cisco").strip()
+    platform = request.args.get("platform", "IOS").strip()
+
+    provider = get_knowledge_provider()
+    found = provider.lookup_command(vendor=vendor, platform=platform, command=command)
+
+    if found is not None:
+        return api_envelope(
+            {
+                "found": True,
+                "source": "knowledge_base",
+                "requires_human_approval": False,
+                "interpretation": {
+                    "command": found.command,
+                    "vendor": found.vendor,
+                    "platform": found.platform,
+                    "meaning": found.meaning,
+                    "security_control": found.security_control,
+                    "mapped_rule_id": found.mapped_rule_id,
+                    "confidence": found.confidence,
+                    "explanation": found.explanation,
+                },
+                "message": "Learned knowledge mapping found in knowledge base.",
+            },
+            200,
+        )
+    else:
+        return api_envelope(
+            {
+                "found": False,
+                "source": None,
+                "requires_human_approval": True,
+                "interpretation": None,
+                "message": "Command not recognized in approved knowledge base.",
+            },
+            200,
+        )
+
+
+@api_bp.route("/api/knowledge/mappings", methods=["GET"])
+def api_knowledge_mappings():
+    """List knowledge mappings with optional filtering by status, vendor, or platform."""
+    provider = get_knowledge_provider()
+    status_filter = request.args.get("status")
+    vendor_filter = request.args.get("vendor")
+    platform_filter = request.args.get("platform")
+
+    if status_filter == "approved":
+        mappings = provider.list_approved(vendor=vendor_filter, platform=platform_filter)
+    elif status_filter == "proposed":
+        mappings = provider.list_proposals(vendor=vendor_filter, platform=platform_filter)
+    else:
+        mappings = provider.service.repo.list_mappings(
+            vendor=vendor_filter,
+            platform=platform_filter,
+            approval_status=status_filter if status_filter in ("approved", "proposed", "rejected") else None,
+        )
+
+    return api_envelope(
+        {
+            "mappings": [m.to_dict() for m in mappings],
+            "count": len(mappings),
+        },
+        200,
+    )
