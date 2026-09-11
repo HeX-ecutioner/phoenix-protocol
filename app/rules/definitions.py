@@ -1,0 +1,111 @@
+"""Deterministic compliance rule definitions."""
+
+from typing import Dict, List
+
+from app.models.rule import Rule
+
+# Stable compliance rules catalog (~10 rules as specified in design contract)
+INITIAL_RULES: List[Rule] = [
+    Rule(
+        rule_id="NET-001",
+        title="Telnet Service Disabled",
+        description="Ensure Telnet service is disabled on all management lines.",
+        technical_requirement="Management lines (line vty) must enforce 'transport input ssh' or equivalent and disallow telnet.",
+        severity="high",
+        device_type="cisco_ios",
+        category="Management Plane Security",
+        remediation="line vty 0 4\n transport input ssh",
+    ),
+    Rule(
+        rule_id="NET-002",
+        title="Secure Administration (SSH Enabled)",
+        description="Ensure SSH version 2 is configured and active for remote management.",
+        technical_requirement="Global configuration must specify 'ip ssh version 2'.",
+        severity="high",
+        device_type="cisco_ios",
+        category="Management Plane Security",
+        remediation="ip ssh version 2",
+    ),
+    Rule(
+        rule_id="NET-003",
+        title="Strong Password Encryption",
+        description="Ensure passwords are encrypted using robust hashing algorithms (avoiding reversible Type 7 or plaintext).",
+        technical_requirement="Enable 'service password-encryption' and use modern secret hashing (e.g. secret type 8 or 9).",
+        severity="high",
+        device_type="cisco_ios",
+        category="Authentication & Passwords",
+        remediation="service password-encryption\nenable secret 9 <secret>",
+    ),
+    Rule(
+        rule_id="NET-004",
+        title="Login Failure Protection",
+        description="Ensure login rate limiting / quiet mode is configured against brute-force attacks.",
+        technical_requirement="Configure 'login block-for <seconds> attempts <tries> within <seconds>'.",
+        severity="medium",
+        device_type="cisco_ios",
+        category="Authentication & Passwords",
+        remediation="login block-for 300 attempts 3 within 60",
+    ),
+    Rule(
+        rule_id="NET-005",
+        title="System Logging Configured",
+        description="Ensure remote syslog host and timestamped logging are configured.",
+        technical_requirement="Must configure 'service timestamps log datetime' and at least one 'logging host <ip>'.",
+        severity="medium",
+        device_type="cisco_ios",
+        category="Logging & Auditing",
+        remediation="service timestamps log datetime msec\nlogging host <syslog-ip>",
+    ),
+    Rule(
+        rule_id="NET-006",
+        title="Trusted Time Source (NTP)",
+        description="Ensure device synchronizes time with an authoritative, trusted NTP server.",
+        technical_requirement="Must configure at least one authoritative 'ntp server <ip>'.",
+        severity="medium",
+        device_type="cisco_ios",
+        category="Time Synchronization",
+        remediation="ntp server <trusted-ntp-ip>",
+    ),
+    Rule(
+        rule_id="NET-007",
+        title="Approved Administrative Access List",
+        description="Ensure access to management lines is restricted by an authorized access control list.",
+        technical_requirement="All vty lines must include 'access-class <name|number> in'.",
+        severity="high",
+        device_type="cisco_ios",
+        category="Access Control",
+        remediation="line vty 0 4\n access-class <acl_number_or_name> in",
+    ),
+    Rule(
+        rule_id="NET-008",
+        title="Unused Insecure Services Disabled",
+        description="Ensure obsolete services such as small servers, finger, HTTP server, and CDP (if external) are disabled.",
+        technical_requirement="Must configure 'no ip http server', 'no service tcp-small-servers', and 'no service udp-small-servers'.",
+        severity="low",
+        device_type="cisco_ios",
+        category="Service Hardening",
+        remediation="no ip http server\nno service tcp-small-servers\nno service udp-small-servers",
+    ),
+    Rule(
+        rule_id="NET-009",
+        title="Device Identification and Banner Metadata",
+        description="Ensure hostname and legal security warning banners are explicitly configured.",
+        technical_requirement="Must configure a non-default 'hostname' and 'banner motd'.",
+        severity="low",
+        device_type="cisco_ios",
+        category="Device Identification",
+        remediation="banner motd ^C Authorized Access Only ^C",
+    ),
+    Rule(
+        rule_id="NET-010",
+        title="Plaintext Secret Detection",
+        description="Ensure no unencrypted passwords, pre-shared keys, or SNMP communities exist in plaintext.",
+        technical_requirement="No passwords with encryption type 0 or default public/private SNMP community strings.",
+        severity="high",
+        device_type="cisco_ios",
+        category="Secret Protection",
+        remediation="Replace unencrypted credentials with hashed secrets or encrypted keys.",
+    ),
+]
+
+RULES_BY_ID: Dict[str, Rule] = {rule.rule_id: rule for rule in INITIAL_RULES}
