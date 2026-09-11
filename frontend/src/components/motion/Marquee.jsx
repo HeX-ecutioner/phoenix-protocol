@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 
 export function Marquee({ items = [] }) {
   const shouldReduceMotion = useReducedMotion();
