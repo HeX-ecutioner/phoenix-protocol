@@ -7,19 +7,33 @@ import { SafetyNotice } from './SafetyNotice';
 import { KineticButton } from './motion/KineticButton';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DISALLOWED_EXTENSIONS = ['.exe', '.dll', '.bin', '.iso', '.zip', '.tar', '.gz', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.mp4', '.mp3'];
+const ALLOWED_EXTENSIONS = ['.txt', '.cfg', '.conf'];
 
 function isValidConfigFile(file) {
   if (!file) return false;
   const name = (file.name || '').toLowerCase();
-  if (DISALLOWED_EXTENSIONS.some((ext) => name.endsWith(ext))) {
-    return false;
+  return ALLOWED_EXTENSIONS.some((ext) => name.endsWith(ext));
+}
+
+function isPastedFilePath(text) {
+  if (!text || typeof text !== 'string') return false;
+  const trimmed = text.trim();
+  const lines = trimmed.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length !== 1) return false;
+  const line = lines[0];
+  if (/\.(?:txt|cfg|conf|ios|log)$/i.test(line)) {
+    if (/[\\/]/.test(line) || /^[a-zA-Z]:/i.test(line)) {
+      return true;
+    }
+    if (line.split(/\s+/).length === 1) {
+      return true;
+    }
   }
-  return true;
+  return false;
 }
 
 function extractFilesOrTextFromClipboard(clipboardData, existingFileNames = []) {
-  if (!clipboardData) return [];
+  if (!clipboardData) return { files: [], error: null };
   const extracted = [];
 
   // 1. First check clipboard File objects (e.g. copied files from Explorer / Finder)
@@ -42,7 +56,7 @@ function extractFilesOrTextFromClipboard(clipboardData, existingFileNames = []) 
   }
 
   if (extracted.length > 0) {
-    return extracted;
+    return { files: extracted, error: null };
   }
 
   // 2. Plaintext configuration fallback
@@ -56,6 +70,13 @@ function extractFilesOrTextFromClipboard(clipboardData, existingFileNames = []) 
   if (text && typeof text === 'string') {
     const trimmed = text.trim();
     if (trimmed.length > 0) {
+      if (isPastedFilePath(trimmed)) {
+        return {
+          files: [],
+          error: `Pasted text appears to be a local file path ("${trimmed}"). Web browsers cannot read local files from clipboard paths. Please use "Choose a file" or drag the file directly from your file manager.`,
+        };
+      }
+
       let filename = 'pasted-config.txt';
       let counter = 1;
       while (existingFileNames.includes(filename)) {
@@ -78,7 +99,7 @@ function extractFilesOrTextFromClipboard(clipboardData, existingFileNames = []) 
     }
   }
 
-  return extracted;
+  return { files: extracted, error: null };
 }
 
 export function ScannerConsole() {
@@ -116,7 +137,7 @@ export function ScannerConsole() {
 
     if (invalidNames.length > 0) {
       setError(
-        `Unsupported binary format: ${invalidNames.join(', ')}. Please provide text configuration files (.txt, .cfg, .conf, .ios).`
+        `Unsupported file format: ${invalidNames.join(', ')}. Supported formats: .txt, .cfg, .conf.`
       );
     }
 
@@ -208,8 +229,12 @@ export function ScannerConsole() {
         const textData = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('Text');
         if (textData && textData.trim().length > 0) {
           const existingNames = filesRef.current.map((f) => f.name);
-          const extracted = extractFilesOrTextFromClipboard(e.dataTransfer, existingNames);
-          if (extracted.length > 0) {
+          const { files: extracted, error: dropError } = extractFilesOrTextFromClipboard(e.dataTransfer, existingNames);
+          if (dropError) {
+            setError(dropError);
+            return;
+          }
+          if (extracted && extracted.length > 0) {
             droppedFiles = extracted;
           }
         }
@@ -223,8 +248,14 @@ export function ScannerConsole() {
 
   const handleDropzonePaste = (e) => {
     const existingNames = filesRef.current.map((f) => f.name);
-    const clipboardFiles = extractFilesOrTextFromClipboard(e.clipboardData, existingNames);
-    if (clipboardFiles.length > 0) {
+    const { files: clipboardFiles, error: pasteError } = extractFilesOrTextFromClipboard(e.clipboardData, existingNames);
+    if (pasteError) {
+      e.preventDefault();
+      e.stopPropagation();
+      setError(pasteError);
+      return;
+    }
+    if (clipboardFiles && clipboardFiles.length > 0) {
       e.preventDefault();
       e.stopPropagation();
       addFiles(clipboardFiles);
@@ -259,7 +290,13 @@ export function ScannerConsole() {
       if (!clipboardData) return;
 
       const existingNames = filesRef.current.map((f) => f.name);
-      const clipboardFiles = extractFilesOrTextFromClipboard(clipboardData, existingNames);
+      const { files: clipboardFiles, error: pasteError } = extractFilesOrTextFromClipboard(clipboardData, existingNames);
+      if (pasteError) {
+        e.preventDefault();
+        e.stopPropagation();
+        setError(pasteError);
+        return;
+      }
       if (clipboardFiles && clipboardFiles.length > 0) {
         e.preventDefault();
         e.stopPropagation();
@@ -304,6 +341,8 @@ export function ScannerConsole() {
 
       setStatus('success');
       setTimeout(() => {
+        setFiles([]);
+        setStatus('idle');
         navigate(`/scans/${scanId}`);
       }, 500);
 
@@ -371,9 +410,10 @@ export function ScannerConsole() {
               type="file"
               id="file-upload"
               multiple
-              accept=".txt,.cfg,.conf,text/plain"
+              accept=".txt,.cfg,.conf"
               className="hidden"
               onChange={handleFileChange}
+              onClick={(e) => e.stopPropagation()}
               disabled={status === 'processing' || status === 'success'}
             />
             <div className="flex flex-col items-center justify-center pointer-events-none select-none">
