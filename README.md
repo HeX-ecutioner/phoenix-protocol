@@ -1,5 +1,8 @@
 # Phoenix Protocol
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Governance](https://img.shields.io/badge/Governance-The_Coastal_Assassins-blue.svg)](GOVERNANCE.md)
+
 ## Project Overview
 
 **Phoenix Protocol** is an adaptive, agentic network security compliance auditor. It helps security administrators inspect network-device configuration files, identify security weaknesses, explain why those weaknesses matter, and recommend vendor-specific corrections.
@@ -119,46 +122,34 @@ Root Agent
     └── Remediation Agent
 ```
 
-## Product Type
-
-Phoenix Protocol should be built as a **desktop-focused web application**, not as a mobile application.
-
-A web application is appropriate because the product requires file uploads, detailed security tables, expandable evidence, audit-progress views, remediation review, and report downloads. Security administrators will normally use it from a laptop or desktop browser.
-
-The project may include a small landing page, but the primary deliverable should be the working audit dashboard.
-
-## Recommended MVP Scope
-
-The first version should focus on a reliable and impressive demonstration rather than claiming complete support for every network vendor or every compliance framework.
-
-The MVP should support a small number of known vendors, approximately 15–30 carefully reviewed compliance rules, evidence-based findings, severity scoring, vendor-specific remediation, PDF reporting, and the Teach the Auditor workflow.
-
-The project should not attempt to implement full framework coverage, live access to many network devices, actual model training, Kubernetes deployment, or complex enterprise authentication during the initial hackathon version.
-
-## Suggested Demonstration
-
-The demonstration should follow this sequence:
-
-1. Upload a Cisco, Juniper, Fortinet, or Palo Alto configuration.
-2. Show the detected vendor and platform.
-3. Display the normalization progress.
-4. Run multiple compliance checks.
-5. Open a failed finding and show its evidence.
-6. Display the risk severity and compliance score.
-7. Show the vendor-specific remediation command.
-8. Upload or reveal an unfamiliar configuration command.
-9. Use **Teach the Auditor** to define its meaning.
-10. Run the audit again and show that the command is now understood.
-
-This demonstrates both the practical security value and the adaptive agentic capability of Phoenix Protocol.
-
 ## One-Sentence Description
 
 > **Phoenix Protocol is an adaptive web-based network security compliance auditor that uses AI agents to understand multi-vendor configurations, deterministic rules to evaluate security, and human-approved remediation to help organizations secure their network infrastructure.**
 
-## Suggested Tagline
+## Screenshots
 
-> **Rise above configuration complexity. Secure every network.**
+<details>
+<summary><b>Click to expand and view application screenshots</b></summary>
+<br>
+
+### 1. Dashboard Overview
+![Dashboard Overview](screenshots/1.png)
+
+### 2. Scan Results
+![Scan Results](screenshots/2.png)
+
+### 3. Rule Details
+![Rule Details](screenshots/3.png)
+
+### 4. Evidence view
+![Evidence View](screenshots/4.png)
+
+### 5. Teach the Auditor
+![Teach the Auditor](screenshots/5.png)
+
+### 6. Compliance Report
+![Compliance Report](screenshots/6.png)
+</details>
 
 ## Monorepo Architecture
 
@@ -400,10 +391,16 @@ Dev2 is independently developing the persistent `KnowledgeService` in her branch
 2. An adapter implementing `KnowledgeProvider` will wrap her `KnowledgeService.lookup_command()`.
 3. When `TeachingProposal` is approved by a human administrator, the proposal will be forwarded to her `approve_mapping()` method for long-term persistence.
 
+## Community & Governance
+
+Phoenix Protocol is an open-source project stewarded by **The Coastal Assassins**. We welcome contributions and community involvement!
+- **[Maintainers](MAINTAINERS.md)**: Meet the core team members guiding the project.
+- **[Contributing](CONTRIBUTING.md)**: Check out our contribution guidelines, development setup, and PR process.
+- **[Code of Conduct](CODE_OF_CONDUCT.md)**: We are committed to fostering a welcoming and inclusive environment.
+- **[Security](SECURITY.md)**: Read our security policy and how to report vulnerabilities.
+- **[License](LICENSE)**: Phoenix Protocol is released under the MIT License.
+
 ## References
 
 [1]: https://google.github.io/adk-docs/ "Google Agent Development Kit Documentation"
-
 [2]: https://www.cisecurity.org/controls "CIS Critical Security Controls"
-
-
