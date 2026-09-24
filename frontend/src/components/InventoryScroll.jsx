@@ -139,7 +139,7 @@ export function InventoryScroll() {
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-20">
           <div className="sticky top-1/2 w-full flex justify-center h-0">
             {/* The ring container */}
-            <div className="w-24 h-24 md:w-[130px] md:h-[130px] rounded-full flex items-center justify-center relative -translate-y-1/2">
+            <div className="w-24 h-24 md:w-[130px] md:h-[130px] rounded-full flex items-center justify-center relative -translate-y-1/2 backdrop-blur-md bg-black/20">
               
               {/* Radial Ticks (Compass/Dial) rotating continuously */}
               <div className="absolute inset-0 flex items-center justify-center animate-[spin_30s_linear_infinite] z-10">
