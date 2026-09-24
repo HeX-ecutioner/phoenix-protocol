@@ -6,7 +6,7 @@ import {
   MOCK_DEVICE_RESULTS
 } from '../data/mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 export async function apiRequest(path, options = {}) {
