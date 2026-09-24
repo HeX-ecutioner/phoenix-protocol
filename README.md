@@ -19,20 +19,25 @@ python start.py
 
 This launcher:
 1. Verifies that Python and Node/npm runtimes and dependencies are installed.
-2. Starts the Flask backend on `http://localhost:5000`.
-3. Starts the Vite frontend on `http://localhost:5173`.
-4. Performs readiness polling on `/health` and frontend root until both services are fully responsive.
-5. Automatically opens the frontend in your default browser (pass `--no-browser` to disable).
-6. Gracefully stops both child processes on `Ctrl+C`.
+2. Automatically detects port conflicts and finds fresh, available ports (default backend: `http://localhost:5001`, default frontend: `http://localhost:5173`) so services never collide with existing applications.
+3. Performs readiness polling on `/health` and frontend root until both services are fully responsive.
+4. Automatically opens the freshly allocated frontend URL in your default browser (pass `--no-browser` to disable).
+5. Gracefully stops all child processes and process groups on `Ctrl+C` or shutdown signals.
 
 ### Launcher Options
 
 ```bash
+# Start services with automatic port allocation (opens browser automatically)
+python start.py
+
 # Start services without auto-opening the web browser
 python start.py --no-browser
 
-# Run on custom ports if needed
-python start.py --port-backend 5000 --port-frontend 5173
+# Run on custom preferred ports
+python start.py --port-backend 5001 --port-frontend 5174
+
+# Exit with an error if requested ports are busy instead of auto-reallocating
+python start.py --strict-ports
 ```
 
 ## What the Project Does
