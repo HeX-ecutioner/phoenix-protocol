@@ -141,7 +141,7 @@ export function DashboardPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-orange/5 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-brand-orange/10 transition-colors duration-1000"></div>
             
             <h2 className="text-xs font-bold tracking-widest text-neutral-400 uppercase mb-4 relative z-10">Tested-Rule Compliance</h2>
-            <div className="text-6xl md:text-8xl font-extrabold text-brand-orange tracking-tighter leading-none mb-6 relative z-10 drop-shadow-[0_0_15px_rgba(204,255,0,0.2)] flex">
+            <div className="text-6xl md:text-8xl font-extrabold text-brand-orange tracking-tighter leading-none mb-6 relative z-10 flex">
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
