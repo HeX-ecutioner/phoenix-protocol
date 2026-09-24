@@ -22,14 +22,14 @@ export function KineticButton({ children, onClick, disabled, className, ...props
       <motion.div
         className="relative z-10 flex items-center justify-center gap-2"
         variants={{
-          hover: { y: "-150%", transition: { duration: 0.3, ease: [0.76, 0, 0.24, 1] } }
+          hover: { y: "-250%", transition: { duration: 0.3, ease: [0.76, 0, 0.24, 1] } }
         }}
       >
         {children}
       </motion.div>
       <motion.div
         className="absolute inset-0 z-10 flex items-center justify-center gap-2"
-        initial={{ y: "150%" }}
+        initial={{ y: "250%" }}
         variants={{
           hover: { y: "0%", transition: { duration: 0.3, ease: [0.76, 0, 0.24, 1] } }
         }}
