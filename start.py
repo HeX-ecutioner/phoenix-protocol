@@ -5,8 +5,12 @@ Starts the Flask backend and Vite frontend services in parallel,
 monitors readiness endpoints, prints clear URLs, and manages clean
 child-process termination on shutdown.
 
+Automatically detects port conflicts (e.g. if an older server is already
+running on 5173 or 5001) and selects a fresh, available port so services
+never collide with pre-existing applications.
+
 Usage:
-    python start.py [--no-browser] [--port-backend 5000] [--port-frontend 5173]
+    python start.py [--no-browser] [--port-backend 5001] [--port-frontend 5173]
 """
 
 import argparse
@@ -15,9 +19,11 @@ import os
 from pathlib import Path
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
+from typing import Optional
 import urllib.error
 import urllib.request
 import webbrowser
@@ -61,6 +67,39 @@ def check_prerequisites(backend_dir: Path, frontend_dir: Path) -> str:
     return npm_path
 
 
+def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
+    """Check if a port is in use or actively listening."""
+    # 1. Connect test (is any server actively listening and accepting connections?)
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.4)
+            if s.connect_ex((host, port)) == 0:
+                return True
+    except OSError:
+        pass
+
+    # 2. Bind test (can we bind without error?)
+    for bind_host in [host, "0.0.0.0"]:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                s.bind((bind_host, port))
+        except OSError:
+            return True
+
+    return False
+
+
+def find_available_port(preferred_port: int, max_attempts: int = 100, host: str = "127.0.0.1") -> int:
+    """Find the first available free port starting from preferred_port."""
+    for port in range(preferred_port, preferred_port + max_attempts):
+        if not is_port_in_use(port, host):
+            return port
+    raise RuntimeError(
+        f"Could not find an available free port in range {preferred_port}-{preferred_port + max_attempts}"
+    )
+
+
 def wait_for_url(url: str, timeout_sec: float = 25.0, poll_interval: float = 0.4) -> bool:
     """Poll an HTTP URL until it returns a 2xx/3xx response or timeout expires."""
     deadline = time.time() + timeout_sec
@@ -79,14 +118,14 @@ def wait_for_url(url: str, timeout_sec: float = 25.0, poll_interval: float = 0.4
     return False
 
 
-def terminate_process(proc: subprocess.Popen) -> None:
+def terminate_process(proc: Optional[subprocess.Popen], is_windows: bool = False) -> None:
     """Safely terminate a child process and its process tree."""
     if proc is None or proc.poll() is not None:
         return
 
     try:
-        if sys.platform == "win32":
-            # On Windows, taskkill /F /T kills the entire process tree (including npm sub-processes)
+        if is_windows:
+            # On Windows, taskkill /F /T kills the entire process tree
             subprocess.run(
                 ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
                 stdout=subprocess.DEVNULL,
@@ -94,11 +133,17 @@ def terminate_process(proc: subprocess.Popen) -> None:
                 check=False,
             )
         else:
-            proc.terminate()
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+            except Exception:
+                proc.terminate()
             try:
                 proc.wait(timeout=2.0)
             except subprocess.TimeoutExpired:
-                proc.kill()
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except Exception:
+                    proc.kill()
     except Exception:
         pass
 
@@ -115,14 +160,19 @@ def main():
     parser.add_argument(
         "--port-backend",
         type=int,
-        default=5000,
-        help="Port for the Flask API backend (default: 5000).",
+        default=5001,
+        help="Port for the Flask API backend (default: 5001).",
     )
     parser.add_argument(
         "--port-frontend",
         type=int,
         default=5173,
         help="Port for the Vite frontend (default: 5173).",
+    )
+    parser.add_argument(
+        "--strict-ports",
+        action="store_true",
+        help="Exit immediately if requested ports are in use instead of allocating fresh ports.",
     )
     args = parser.parse_args()
 
@@ -132,13 +182,43 @@ def main():
 
     npm_path = check_prerequisites(BACKEND_DIR, FRONTEND_DIR)
 
-    backend_url = f"http://localhost:{args.port_backend}"
-    backend_health_url = f"http://127.0.0.1:{args.port_backend}/health"
-    frontend_url = f"http://localhost:{args.port_frontend}"
-    frontend_check_url = f"http://127.0.0.1:{args.port_frontend}/"
+    # ------------------------------------------------------------------------
+    # Port Conflict Detection & Fresh Port Allocation
+    # ------------------------------------------------------------------------
+    backend_port = args.port_backend
+    if is_port_in_use(backend_port):
+        if args.strict_ports:
+            print(f"[ERROR] Backend port {backend_port} is already in use.", file=sys.stderr)
+            sys.exit(1)
+        backend_port = find_available_port(backend_port + 1)
+        print(
+            f"[INFO] Backend port {args.port_backend} is already in use by another process. "
+            f"Allocating fresh port: {backend_port}."
+        )
+
+    frontend_port = args.port_frontend
+    if is_port_in_use(frontend_port):
+        if args.strict_ports:
+            print(f"[ERROR] Frontend port {frontend_port} is already in use.", file=sys.stderr)
+            sys.exit(1)
+        frontend_port = find_available_port(frontend_port + 1)
+        print(
+            f"[INFO] Frontend port {args.port_frontend} is already in use by another application. "
+            f"Allocating fresh port: {frontend_port} to prevent collision."
+        )
+
+    backend_url = f"http://localhost:{backend_port}"
+    backend_health_url = f"http://127.0.0.1:{backend_port}/health"
+    frontend_url = f"http://localhost:{frontend_port}"
+    frontend_check_url = f"http://127.0.0.1:{frontend_port}/"
 
     backend_env = os.environ.copy()
     backend_env["PYTHONUNBUFFERED"] = "1"
+    # Allow CORS from chosen frontend origin as well as default local origins
+    backend_env["CORS_ALLOWED_ORIGINS"] = (
+        f"{frontend_url},http://127.0.0.1:{frontend_port},"
+        f"http://localhost:5173,http://127.0.0.1:5173"
+    )
 
     backend_cmd = [
         sys.executable,
@@ -148,10 +228,13 @@ def main():
         "app.api:create_app()",
         "run",
         "--port",
-        str(args.port_backend),
+        str(backend_port),
         "--host",
-        "127.0.0.1",
+        "0.0.0.0",
     ]
+
+    frontend_env = os.environ.copy()
+    frontend_env["VITE_API_BASE_URL"] = backend_url
 
     frontend_cmd = [
         npm_path,
@@ -161,28 +244,37 @@ def main():
         "--host",
         "127.0.0.1",
         "--port",
-        str(args.port_frontend),
+        str(frontend_port),
+        "--strictPort",
     ]
 
-    # Use shell=True on Windows for npm execution if needed
     is_windows = sys.platform == "win32"
 
-    backend_proc = None
-    frontend_proc = None
+    backend_proc: Optional[subprocess.Popen] = None
+    frontend_proc: Optional[subprocess.Popen] = None
 
     def cleanup_all():
-        terminate_process(backend_proc)
-        terminate_process(frontend_proc)
+        terminate_process(backend_proc, is_windows=is_windows)
+        terminate_process(frontend_proc, is_windows=is_windows)
 
     atexit.register(cleanup_all)
 
+    def handle_signal(sig, frame):
+        print("\n[INFO] Shutdown signal received. Stopping Phoenix Protocol services...")
+        cleanup_all()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
     try:
         # Start Backend
-        print(f"Starting backend on port {args.port_backend}...")
+        print(f"Starting backend on port {backend_port}...")
         backend_proc = subprocess.Popen(
             backend_cmd,
             cwd=str(BACKEND_DIR),
             env=backend_env,
+            start_new_session=(not is_windows),
         )
 
         if not wait_for_url(backend_health_url, timeout_sec=15.0):
@@ -201,11 +293,13 @@ def main():
         print(f"Backend ready:  {backend_url}")
 
         # Start Frontend
-        print(f"Starting frontend on port {args.port_frontend}...")
+        print(f"Starting frontend on port {frontend_port}...")
         frontend_proc = subprocess.Popen(
             frontend_cmd,
             cwd=str(FRONTEND_DIR),
+            env=frontend_env,
             shell=is_windows,
+            start_new_session=(not is_windows),
         )
 
         if not wait_for_url(frontend_check_url, timeout_sec=20.0):
@@ -223,11 +317,14 @@ def main():
 
         print(f"Frontend ready: {frontend_url}")
         print()
-        print("Phoenix Protocol is ready.")
+        print(f"Phoenix Protocol is ready.")
+        print(f"  Backend URL:  {backend_url}")
+        print(f"  Frontend URL: {frontend_url}")
         print("Press Ctrl+C to stop all services.")
 
         if not args.no_browser:
             try:
+                print(f"[INFO] Opening {frontend_url} in browser...")
                 webbrowser.open(frontend_url)
             except Exception:
                 pass
