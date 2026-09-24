@@ -17,19 +17,19 @@ export function ScanNotes() {
           
           <div className="space-y-4">
             <ScrollReveal delay={0.1}>
-              <div className="p-6 border-l-2 border-brand-orange bg-neutral-900/40 backdrop-blur-sm rounded-r-sm">
+              <div className="p-6 border-l-2 border-brand-orange bg-neutral-900/40 backdrop-blur-sm rounded-r-sm hover:-translate-y-1 hover:bg-neutral-800/60 transition-all duration-300 cursor-default">
                 <div className="text-xs font-bold uppercase tracking-widest text-brand-orange mb-2">Insight</div>
                 <p className="text-neutral-300 text-sm">Most misconfigurations are syntactic, not architectural. Analyzing raw config text catches 90% of vulnerability vectors before deployment.</p>
               </div>
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
-              <div className="p-6 border-l-2 border-cyan-400 bg-neutral-900/40 backdrop-blur-sm rounded-r-sm">
+              <div className="p-6 border-l-2 border-cyan-400 bg-neutral-900/40 backdrop-blur-sm rounded-r-sm hover:-translate-y-1 hover:bg-neutral-800/60 transition-all duration-300 cursor-default">
                 <div className="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2">Observation</div>
                 <p className="text-neutral-300 text-sm">Network environments rarely maintain 100% compliance. The goal is identifying "High Severity" drift in protocols like SNMP and SSH.</p>
               </div>
             </ScrollReveal>
             <ScrollReveal delay={0.3}>
-              <div className="p-6 border-l-2 border-neutral-600 bg-neutral-900/40 backdrop-blur-sm rounded-r-sm">
+              <div className="p-6 border-l-2 border-neutral-600 bg-neutral-900/40 backdrop-blur-sm rounded-r-sm hover:-translate-y-1 hover:bg-neutral-800/60 transition-all duration-300 cursor-default">
                 <div className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">Compliance</div>
                 <p className="text-neutral-300 text-sm">Designed specifically to align with Zero Trust and strict enterprise demarcation requirements.</p>
               </div>
