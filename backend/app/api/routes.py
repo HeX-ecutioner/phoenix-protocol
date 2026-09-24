@@ -115,14 +115,26 @@ def _get_allowed_origins() -> set:
     return set(DEFAULT_ALLOWED_ORIGINS)
 
 
+def _is_origin_allowed(origin: Optional[str]) -> bool:
+    """Determine if an origin is permitted by configuration or local development rules."""
+    if not origin:
+        return False
+    allowed = _get_allowed_origins()
+    if "*" in allowed or origin in allowed:
+        return True
+    # Allow local development origins on loopback (localhost or 127.0.0.1 on any port)
+    if re.match(r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$", origin):
+        return True
+    return False
+
+
 @api_bp.before_request
 def handle_preflight():
     """Intercept and answer pre-flight CORS OPTIONS requests."""
     if request.method == "OPTIONS":
         response = make_response("", 204)
         origin = request.headers.get("Origin")
-        allowed = _get_allowed_origins()
-        if origin and ("*" in allowed or origin in allowed):
+        if _is_origin_allowed(origin):
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = (
@@ -136,8 +148,7 @@ def handle_preflight():
 def add_cors_headers(response: Response) -> Response:
     """Attach explicit CORS headers for authorized origins."""
     origin = request.headers.get("Origin")
-    allowed = _get_allowed_origins()
-    if origin and ("*" in allowed or origin in allowed):
+    if _is_origin_allowed(origin):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = (
