@@ -567,9 +567,15 @@ def test_cors_preflight_and_headers(client: FlaskClient):
     assert get_res.status_code == 200
     assert get_res.headers.get("Access-Control-Allow-Origin") == origin
 
-    # 3. Disallowed origin does not get CORS headers
+    # 3. Dynamic local development origins on other ports are also allowed
+    dynamic_res = client.get("/api/device-types", headers={"Origin": "http://localhost:5174"})
+    assert dynamic_res.status_code == 200
+    assert dynamic_res.headers.get("Access-Control-Allow-Origin") == "http://localhost:5174"
+
+    # 4. Disallowed origin does not get CORS headers
     disallowed_res = client.get(
         "/api/device-types", headers={"Origin": "http://malicious-site.com"}
     )
     assert disallowed_res.status_code == 200
     assert disallowed_res.headers.get("Access-Control-Allow-Origin") is None
+
