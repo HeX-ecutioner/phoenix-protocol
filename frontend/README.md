@@ -2,6 +2,10 @@
 
 This is the frontend interface for Phoenix Protocol, a read-only network-device configuration compliance scanner.
 
+### Live Deployment
+- **Production URL**: [https://phoenix-protocol-app.vercel.app](https://phoenix-protocol-app.vercel.app)
+- **Alternative Mirror**: [https://the-phoenix-protocol.vercel.app](https://the-phoenix-protocol.vercel.app)
+
 ## Setup
 
 The frontend is built using React and Vite. It connects to the backend API.
