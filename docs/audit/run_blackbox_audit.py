@@ -12,9 +12,10 @@ import sys
 import requests
 
 BASE_URL = "http://127.0.0.1:5000"
-REPO_ROOT = Path(__file__).resolve().parent.parent
+AUDIT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = AUDIT_DIR.parent.parent
 SAMPLE_DATA = REPO_ROOT / "backend" / "sample_data"
-RESPONSES_DIR = REPO_ROOT / "audit" / "api_responses"
+RESPONSES_DIR = AUDIT_DIR / "api_responses"
 RESPONSES_DIR.mkdir(parents=True, exist_ok=True)
 
 test_manifest = [

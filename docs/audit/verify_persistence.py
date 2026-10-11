@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 import sqlite3
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+AUDIT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = AUDIT_DIR.parent.parent
 DB_PATH = REPO_ROOT / "backend" / "phoenix_protocol.db"
 
 if not DB_PATH.exists():

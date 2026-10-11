@@ -14,9 +14,10 @@ from pathlib import Path
 import re
 import sqlite3
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+AUDIT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = AUDIT_DIR.parent.parent
 SAMPLE_DATA = REPO_ROOT / "backend" / "sample_data" / "security"
-RESPONSES_DIR = REPO_ROOT / "audit" / "api_responses"
+RESPONSES_DIR = AUDIT_DIR / "api_responses"
 BACKEND_DIR = REPO_ROOT / "backend"
 
 # Known raw secret values present in sample_data/security/ files

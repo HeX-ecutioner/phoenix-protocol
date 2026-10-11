@@ -138,22 +138,22 @@ Root Agent
 <br>
 
 ### 1. Dashboard Overview
-![Dashboard Overview](screenshots/1.png)
+![Dashboard Overview](docs/screenshots/1.png)
 
 ### 2. Scan Results
-![Scan Results](screenshots/2.png)
+![Scan Results](docs/screenshots/2.png)
 
 ### 3. Rule Details
-![Rule Details](screenshots/3.png)
+![Rule Details](docs/screenshots/3.png)
 
 ### 4. Evidence view
-![Evidence View](screenshots/4.png)
+![Evidence View](docs/screenshots/4.png)
 
 ### 5. Teach the Auditor
-![Teach the Auditor](screenshots/5.png)
+![Teach the Auditor](docs/screenshots/5.png)
 
 ### 6. Compliance Report
-![Compliance Report](screenshots/6.png)
+![Compliance Report](docs/screenshots/6.png)
 </details>
 
 ## Monorepo Architecture
@@ -168,18 +168,26 @@ phoenix-protocol/
 │   ├── public/ # Static assets and branding
 │   └── package.json
 │
-└── backend/    # Flask REST API, scanner engine, AI agents, and knowledge base
-    ├── app/               # Authoritative backend application package
-    │   ├── api/           # Flask REST API routes (/health, /scan)
-    │   ├── services/      # Scanner and compliance service
-    │   ├── parsers/       # Network configuration parsers
-    │   ├── rules/         # NET-001..NET-010 deterministic rules
-    │   └── agents/        # Teach-the-Auditor & remediation agents
-    ├── knowledge/         # Persistent Teach-the-Auditor knowledge layer
-    ├── examples/          # Executable end-to-end integration demo
-    ├── sample_data/       # Network configuration test fixtures
-    ├── tests/             # Automated test suite (177 tests)
-    └── requirements.txt   # Python runtime and test dependencies
+├── backend/    # Flask REST API, scanner engine, AI agents, and knowledge base
+│   ├── app/               # Authoritative backend application package
+│   │   ├── api/           # Flask REST API routes (/health, /scan)
+│   │   ├── services/      # Scanner and compliance service
+│   │   ├── parsers/       # Network configuration parsers
+│   │   ├── rules/         # NET-001..NET-010 deterministic rules
+│   │   └── agents/        # Teach-the-Auditor & remediation agents
+│   ├── knowledge/         # Persistent Teach-the-Auditor knowledge layer
+│   ├── examples/          # Executable end-to-end integration demo
+│   ├── sample_data/       # Network configuration test fixtures
+│   ├── tests/             # Automated test suite (177 tests)
+│   └── requirements.txt   # Python runtime and test dependencies
+│
+├── docs/       # Documentation, audit reports, screenshots, and visual branding
+│   ├── audit/         # 15 thematic audit reports & black-box evidence
+│   ├── screenshots/   # Application interface captures
+│   ├── logo/          # High-resolution logos & vector graphics
+│   └── script.md      # Presentation script & teacher walkthrough
+│
+└── .github/    # Repository community standards, issue templates & governance
 ```
 
 ### Quickstart
@@ -400,9 +408,9 @@ Dev2 is independently developing the persistent `KnowledgeService` in her branch
 
 Phoenix Protocol is an open-source project stewarded by **The Coastal Assassins**. We welcome contributions and community involvement!
 - **[Maintainers](MAINTAINERS.md)**: Meet the core team members guiding the project.
-- **[Contributing](CONTRIBUTING.md)**: Check out our contribution guidelines, development setup, and PR process.
-- **[Code of Conduct](CODE_OF_CONDUCT.md)**: We are committed to fostering a welcoming and inclusive environment.
-- **[Security](SECURITY.md)**: Read our security policy and how to report vulnerabilities.
+- **[Contributing](.github/CONTRIBUTING.md)**: Check out our contribution guidelines, development setup, and PR process.
+- **[Code of Conduct](.github/CODE_OF_CONDUCT.md)**: We are committed to fostering a welcoming and inclusive environment.
+- **[Security](.github/SECURITY.md)**: Read our security policy and how to report vulnerabilities.
 - **[License](LICENSE)**: Phoenix Protocol is released under the MIT License.
 
 ## References

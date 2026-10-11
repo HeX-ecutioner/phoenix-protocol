@@ -64,11 +64,11 @@ This directory contains the independent, read-only technical audit evidence pack
 
 3. **Re-run the Black-Box Probing Suite**:
    ```bash
-   python audit/run_blackbox_audit.py
+   python docs/audit/run_blackbox_audit.py
    ```
 
 4. **Re-run the Security & Persistence Verifiers**:
    ```bash
-   python audit/run_security_audit.py
-   python audit/verify_persistence.py
+   python docs/audit/run_security_audit.py
+   python docs/audit/verify_persistence.py
    ```
